@@ -1,37 +1,29 @@
 <template>
   <div id="app">
-
     <Navbar
       :activeKey="currentKey"
       :routes="routes"
       @nav="onNav"
     />
+    
     <router-view />
 
-    
     <HelloWorld msg="Welcome to Your Vue.js App"/>
     <ImportPage />
-
   </div>
-  
 </template>
 
 <script>
-
 import Navbar from './components/menu/nav_barre.vue'
-import HelloWorld from './components/HelloWorld.vue'  // si tu veux garder HelloWorld
-
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from './components/HelloWorld.vue' 
 import ImportPage from './components/pages/ImportPage.vue'
-
-
 
 export default {
   name: 'App',
   components: {
-
     Navbar,
-    HelloWorld   // si tu veux garder HelloWorld
+    HelloWorld,
+    ImportPage
   },
   data() {
     return {
