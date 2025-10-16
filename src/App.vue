@@ -1,20 +1,42 @@
 <template>
   <div id="app">
-    <Navbar/>
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Navbar
+      :activeKey="currentKey"
+      :routes="routes"
+      @nav="onNav"
+    />
+    <router-view />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import Navbar from './components/menu/nav_barre.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
     Navbar
+  },
+  data() {
+    return {
+      currentKey: 'import',
+      routes: {
+        dashboard: '/',
+        import: '/import',
+        export: '/export',
+        drivers: '/drivers',
+        trucks: '/trucks'
+      }
+    }
+  },
+  watch: {
+    $route(to) {
+      const map = { '/': 'dashboard', '/import': 'import', '/export': 'export', '/drivers': 'drivers', '/trucks': 'trucks' }
+      this.currentKey = map[to.path] || ''
+    }
+  },
+  methods: {
+    onNav(key) { this.currentKey = key }
   }
 }
 </script>
@@ -24,7 +46,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 </style>
