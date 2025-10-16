@@ -19,7 +19,7 @@
 <script>
 
 import Navbar from './components/menu/nav_barre.vue'
-import HelloWorld from './components/HelloWorld.vue'  // si tu veux garder HelloWorld
+
 
 import HelloWorld from './components/HelloWorld.vue'
 import ImportPage from './components/pages/ImportPage.vue'
@@ -31,6 +31,7 @@ export default {
   components: {
 
     Navbar,
+    ImportPage,
     HelloWorld   // si tu veux garder HelloWorld
   },
   data() {
