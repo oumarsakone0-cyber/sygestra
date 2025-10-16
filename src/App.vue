@@ -11,11 +11,13 @@
 
 <script>
 import Navbar from './components/menu/nav_barre.vue'
+import HelloWorld from './components/HelloWorld.vue'  // si tu veux garder HelloWorld
 
 export default {
   name: 'App',
   components: {
-    Navbar
+    Navbar,
+    HelloWorld   // si tu veux garder HelloWorld
   },
   data() {
     return {
@@ -31,12 +33,20 @@ export default {
   },
   watch: {
     $route(to) {
-      const map = { '/': 'dashboard', '/import': 'import', '/export': 'export', '/drivers': 'drivers', '/trucks': 'trucks' }
+      const map = {
+        '/': 'dashboard',
+        '/import': 'import',
+        '/export': 'export',
+        '/drivers': 'drivers',
+        '/trucks': 'trucks'
+      }
       this.currentKey = map[to.path] || ''
     }
   },
   methods: {
-    onNav(key) { this.currentKey = key }
+    onNav(key) {
+      this.currentKey = key
+    }
   }
 }
 </script>
