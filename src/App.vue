@@ -25,8 +25,6 @@
       <!-- Contenu principal -->
       <div class="content">
         <router-view />
-        <HelloWorld msg="Welcome to Your Vue.js App"/>
-        <ImportPage />
       </div>
     </div>
   </div>
@@ -35,21 +33,17 @@
 
 <script>
 import Navbar from './components/menu/nav_barre.vue'
-import HelloWorld from './components/HelloWorld.vue'
-import ImportPage from './components/pages/ImportPage.vue'
 import Sidebar from './components/menu/sidebar.vue' // 
 
 export default {
   name: 'App',
   components: {
     Navbar,
-    ImportPage,
-    HelloWorld,
     Sidebar
   },
   data() {
     return {
-      currentKey: 'import',
+      currentKey: 'dashboard',
       isSidebarOpen: false, // 👈 nouveau
       routes: {
         dashboard: '/',

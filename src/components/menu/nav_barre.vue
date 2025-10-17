@@ -119,7 +119,7 @@
       </li>
     </ul>
   </nav>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -385,20 +385,25 @@ export default {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: env(safe-area-inset-bottom);
+  bottom: 0;
   display: none; /* visible en mobile */
   justify-content: center;
-  align-items: center;
-  height: 64px;
+  align-items: flex-end;
+  height: 80px;
   z-index: 1050;
+  background: transparent;
+  padding: 0 15px 10px;
 }
 .bottom-bar .bottom-group {
   display: flex;
-  gap: 18px;
+  gap: 30px;
   background: #ffffff;
-  padding: 10px 16px;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 12px 20px;
+  border-radius: 25px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  align-items: center;
+  flex: 1;
+  max-width: calc(100vw - 30px);
 }
 .bottom-bar .bottom-group li {
   display: flex;
@@ -413,14 +418,17 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  margin: 0 10px;
+  width: 60px;
+  height: 60px;
+  margin: 0 15px;
   border-radius: 50%;
   background: #0a7a00;
   color: #fff;
   border: none;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
 }
 @media (max-width: 680px) {
   .bottom-bar { display: flex; }

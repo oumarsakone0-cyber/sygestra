@@ -7,11 +7,13 @@ import 'element-ui/lib/theme-chalk/index.css';
 import 'vuesax/dist/vuesax.css' //Vuesax styles
 import 'material-icons/iconfont/material-icons.css';
 
+import router from './router'
 Vue.use(Vuesax);
 Vue.use(ElementUI);
 
 Vue.config.productionTip = false
 
 new Vue({
+  router,
   render: h => h(App),
 }).$mount('#app')
