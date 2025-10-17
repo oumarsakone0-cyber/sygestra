@@ -133,50 +133,59 @@ export default {
 };
 </script>
 
-<style scoped>
-.import-page { padding: 0 ;margin: -16px; }
-/* header card */
-/* header card container */
+
+
+<style >
+/* Layout global */
+.import-page {
+  padding: 0 ;
+  margin: -18px;
+  box-sizing: border-box;
+}
+
+/* Header card */
 .header-card {
   position: relative;
   background: #fff;
   border-radius: 8px;
-  padding: 14px 22px 18px;
+  padding: 16px 22px 20px;
   margin-bottom: 18px;
   box-shadow: 0 2px 8px rgba(60,60,60,0.06);
-  overflow: visible; /* important: éviter de couper le bouton */
+  overflow: visible;
+  
 }
 
-/* bottom red bar */
+/* Red bottom accent */
 .header-bottom-bar {
   position: absolute;
   left: 0;
   right: 0;
   bottom: -6px;
-  height: 4px;
+  height: 6px;
   background: #d87d85;
   border-radius: 0 0 8px 8px;
   z-index: 1;
 }
 
-/* header layout */
+/* Header layout */
 .import-header {
   display: flex;
   align-items: center;
   gap: 20px;
   width: 100%;
-  z-index: 2; /* au-dessus de la barre rouge */
+  z-index: 2;
 }
 
-/* left block (titre + date) occupe l'espace disponible */
+/* Left block (title + date) */
 .header-left {
   display: flex;
   align-items: center;
   gap: 20px;
   flex: 1 1 auto;
+  min-width: 0; /* éviter overflow */
 }
 
-/* pousse le bouton à l'extrême droite */
+/* Historique button (desktop) */
 .history-btn {
   margin-left: auto;
   padding: 10px 18px;
@@ -185,93 +194,201 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  white-space: nowrap;   /* empêche le texte d'être cassé */
-  min-width: 110px;      /* assure espace suffisant pour "Historique" */
+  white-space: nowrap;
+  min-width: 110px;
   z-index: 3;
-  overflow: visible;
 }
 
-/* si tu avais une version "history-btn-left", la cacher */
+/* Optional hidden left-history variant */
 .history-btn-left { display: none !important; }
 
-.section-title { display:flex; align-items:flex-start; gap:8px; font-weight:700; font-size:30px; }
-.title-dossiers { color:#c32d39; }
-.title-sub { color:#222; }
+/* Title */
+.section-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 24px;
+  white-space: nowrap;
+}
+.title-dossiers { color: #c32d39; }
+.title-sub { color: #222; }
 .slash { margin: 0 6px; color: rgba(0,0,0,0.45); }
 
-/* date range */
-.date-search { display:flex; align-items:center; margin-left:24px; }
-.date-box{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  background:#fff;  
-  padding:8px 14px;
+/* Date range container */
+.date-search { display: flex; align-items: center; }
+.date-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid rgba(195,45,57,0.12);
+  border-radius: 28px;
+  padding: 8px 14px;
+  height: 48px;
+  box-sizing: border-box;
+  min-width: 260px;
 }
-.calendar-icon{ color: rgba(0,0,0,0.35); font-size:20px; margin-right:6px; }
-.block { display:flex; align-items:center; gap:10px; height: 100px; }
-
+.calendar-icon { color: rgba(0,0,0,0.35); font-size: 20px; margin-right: 6px; }
+.block { display:flex; align-items:center; gap:10px; height: auto; }
 
 /* el-date-picker styling */
-.el-range-picker { width:420px; max-width:100%; background:transparent; }
-.el-range-picker .el-input__inner { border:none; padding:6px 8px; font-size:14px; background:transparent; box-shadow:none; }
-
-/* search round button */
-.search-circle{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  border:1px solid rgba(0,0,0,0.08);
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  margin-left:8px;
+.el-range-picker { width: 420px; max-width: 100%; background: transparent; }
+.el-range-picker .el-input__inner {
+  border: none;
+  padding: 6px 8px;
+  font-size: 14px;
+  background: transparent;
+  box-shadow: none;
 }
-.search-circle .material-icons{ font-size:20px; color:#666; }
 
+/* Search round button */
+.search-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.search-circle .material-icons { font-size: 20px; color: #666; }
 
+/* Subtitle */
+.import-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 18px 0 10px 4px;
+  color: #222;
+  text-align: left;
+}
 
-/* sous-titre */
-.import-title { font-size: 18px; font-weight: 600; margin: 18px 0 10px 12px; color: #222; text-align:left; }
-.import-sub { color:#222; font-weight:700; }
-
-/* cards grid */
+/* Cards grid */
 .companies-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 28px 22px;
   margin-top: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* company card */
+/* Company card */
 .company-card {
   min-height: 220px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(60,60,60,0.07);
   position: relative;
-  padding-bottom: 18px;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-word;
 }
-.company-card-header { display:flex; align-items:center; gap:10px; font-size:20px; font-weight:600; margin-bottom:12px; }
-.company-name { font-weight:600; font-size:18px; color:#222; }
+.company-card-header { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:600; margin-bottom:12px; }
+.company-name { font-weight:600; font-size:16px; color:#222; }
 
-.company-status { display:flex; gap:48px; margin-bottom:10px; justify-content:flex-start; }
+/* Status / values */
+.company-status { display:flex; gap:36px; margin-bottom:10px; align-items:flex-start; }
 .status-block { display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
-.status-label { font-size:16px; font-weight:500; color:#757575; margin-top:6px; }
+.status-label { font-size:14px; font-weight:500; color:#757575; margin-top:6px; }
 
-.company-values { display:flex; gap:48px; margin-bottom:8px; justify-content:flex-start; align-items:flex-end; }
-.val-block { display:flex; flex-direction:column; align-items:flex-start; }
-.value { font-size:20px; font-weight:700; color:#222; margin-bottom:6px; }
-.value-label { font-size:15px; color:#757575; }
+.company-values { display:flex; gap:36px; margin-bottom:8px; align-items:flex-end; }
+.value { font-size:18px; font-weight:700; color:#222; margin-bottom:6px; }
+.value-label { font-size:13px; color:#757575; }
 
+/* Card bottom bar */
 .card-bottom-bar { position:absolute; left:0; bottom:0; width:100%; height:4px; background:#2dc732; border-radius:0 0 12px 12px; }
 
-/* responsive tweaks */
+/* ---------- RESPONSIVE ---------- */
+
+/* Tablet / small screens */
 @media (max-width: 900px) {
-  .el-range-picker { width:300px; }
-  .section-title { font-size:18px; }
-  .history-btn { left:12px; top:56px; padding:8px 16px; }
-  .companies-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .import-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .header-left {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .section-title { font-size: 20px; }
+
+  .date-box {
+    width: 100%;
+    justify-content: space-between;
+    padding: 8px 12px;
+    height: 44px;
+    gap: 8px;
+  }
+  .el-range-picker { width: 100% !important; max-width: none; }
+
+  .history-btn {
+    margin-left: 0;
+    align-self: flex-end;
+    padding: 8px 12px;
+    min-width: 90px;
+    font-size: 14px;
+  }
+
+  .companies-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+  }
+
+  .company-card { min-height: 160px; padding: 14px; }
 }
+
+/* Narrow mobile (smartphones) */
+@media (max-width: 420px) {
+  .header-card { padding: 0px; }
+  .header-bottom-bar { height: 4px; bottom: -5px; }
+
+  .import-header { gap: 8px; align-items: flex-start; }
+
+  .section-title { font-size: 20px; }
+
+  /* compact history button: icon-only */
+  .history-btn {
+    margin-left: 8px;
+    padding: 8px;
+    width: 35px;
+    height: 40px;
+    font-size: 0; /* hide text label, keep icon */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .history-btn .vs-icon,
+  .history-btn i.material-icons { font-size: 18px; }
+
+  /* date full width below title */
+  .date-search { width: 100%; order: 2; }
+  .date-box { width: 100%; padding: 6px 10px; height: 44px; border-radius: 22px; }
+
+  /* narrow cards like mock */
+  .companies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .company-card { min-height: 100px; margin: auto; padding: 1px; border-radius: 8px; }
+
+  .company-card-header { font-size: 13px; gap: 8px; }
+  .company-name { font-size: 12px; }
+  .company-status { gap: 10px; }
+  .status-label { font-size: 12px; }
+  .company-values { gap: 8px; }
+  .value { font-size: 14px; }
+  .value-label { font-size: 12px; color: #888; }
+}
+
+/* Safety: prevent truncation */
+.history-btn, .history-btn * { white-space: nowrap; overflow: visible; }
 </style>
