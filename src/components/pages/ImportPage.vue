@@ -1,140 +1,203 @@
+// ...existing code...
 <template>
   <div class="import-page">
-    <!-- En-tête -->
-    <div class="import-header">
-      <span class="section-title">
-        <vs-icon icon="home" size="22" color="#c32d39" />
-        <span class="title-dossiers">DOSSIERS</span> / <span class="title-sub">IMPORT</span>
-      </span>
+    <!-- header card with red bottom bar -->
+    <div class="header-card">
+      <div class="import-header">
+        <span class="section-title">
+          <vs-icon icon="home" size="22" color="#c32d39" />
+          <span class="title-dossiers">DOSSIERS</span>
+          <span class="slash">/</span>
+          <span class="title-sub">IMPORT</span>
+        </span>
 
-      <!-- date range styled like la maquette -->
-      <div class="date-search">
-        <div class="date-box">
-          <i class="material-icons calendar-icon">calendar_today</i>
-
-          <vs-input class="date-input" type="date" v-model="dateStart" />
-          <span class="date-sep">à</span>
-          <vs-input class="date-input" type="date" v-model="dateEnd" />
-
-          <button class="search-circle" @click="onFilter" aria-label="Rechercher">
-            <i class="material-icons">search</i>
-          </button>
+        <!-- date range + recherche -->
+        <div class="date-search">
+          <div class="date-box">
+            
+            <div class="block">
+              
+              <el-date-picker
+                v-model="value1"
+                type="daterange"
+                range-separator="à"
+                start-placeholder="Date de début"
+                end-placeholder="Date de fin"
+                unlink-panels
+                format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd"
+                @change="onDateChange"
+                class="el-range-picker"
+              />
+            </div>
+            <button class="search-circle" @click="onFilter" aria-label="Rechercher">
+              <i class="material-icons">search</i>
+            </button>
+          </div>
         </div>
+
+        <!-- historique placed on the right inside header -->
+        <vs-button class="history-btn" icon="list" type="filled" color="#c32d39">
+          Historique
+        </vs-button>
       </div>
 
-      <!-- bouton repositionné comme sur la maquette -->
-      <vs-button class="history-btn" icon="list" type="filled" color="#c32d39">
-        Historique
-      </vs-button>
+      <!-- red bottom bar of the header card -->
+      <div class="header-bottom-bar"></div>
     </div>
 
     <!-- Sous-titre -->
     <div class="import-title">
-      <span>BILAN ARMATEURS <span style="color:#222;">IMPORT</span></span>
+      BILAN ARMATEURS <span class="import-sub">IMPORT</span>
     </div>
 
-    <!-- Grille de cards (vide tant que companies.length === 0) -->
+    <!-- Grille cards (exemples) -->
     <div class="companies-grid">
-      <template v-if="companies.length">
-        <vs-card v-for="company in companies" :key="company.name" class="company-card">
-          <template #title>
-            <div class="company-card-header">
-              <vs-icon icon="local_shipping" size="28" color="#5b9bd5" />
-              <span class="company-name">{{ company.name }}</span>
-            </div>
-          </template>
-
-          <div class="company-status">
-            <div>
-              <vs-icon icon="inventory_2" size="22" color="#f9a825" />
-              <span class="status-title">STOCK</span>
-            </div>
-            <div>
-              <vs-icon icon="done_all" size="22" color="#43a047" />
-              <span class="status-title">LIVRE</span>
-            </div>
-            <div>
-              <vs-icon icon="trolley" size="22" color="#5b6bc0" />
-              <span class="status-title">RECUPERE</span>
-            </div>
+      <vs-card v-for="c in companies" :key="c.name" class="company-card">
+        <template #title>
+          <div class="company-card-header">
+            <vs-icon icon="local_shipping" size="28" color="#5b9bd5" />
+            <span class="company-name">{{ c.name }}</span>
           </div>
+        </template>
 
-          <div class="company-values">
-            <div>
-              <span class="value">{{ company.stock }}</span>
-              <span class="value-label">Ordre(s)</span>
-            </div>
-            <div>
-              <span class="value">{{ company.containers }}</span>
-              <span class="value-label">Conteneur(s)</span>
-            </div>
-            <div>
-              <span class="value">{{ company.orders }}</span>
-              <span class="value-label">Ordre(s)</span>
-            </div>
+        <div class="company-status">
+          <div class="status-block">
+            <vs-icon icon="inventory_2" size="22" color="#f9a825" />
+            <div class="status-label">STOCK</div>
           </div>
-
-          <div class="card-bottom-bar"></div>
-        </vs-card>
-      </template>
-
-      <template v-else>
-        <!-- placeholder visuel quand aucune donnée -->
-        <div class="empty-placeholder">
-          <p>Aucune donnée disponible. Utilisez la sélection de date ou importez des données pour afficher les cards.</p>
+          <div class="status-block">
+            <vs-icon icon="done_all" size="22" color="#43a047" />
+            <div class="status-label">LIVRE</div>
+          </div>
+          <div class="status-block">
+            <vs-icon icon="trolley" size="22" color="#5b6bc0" />
+            <div class="status-label">RECUPERE</div>
+          </div>
         </div>
-      </template>
+
+        <div class="company-values">
+          <div class="val-block">
+            <div class="value">{{ c.stock }}</div>
+            <div class="value-label">Ordre(s)</div>
+          </div>
+          <div class="val-block">
+            <div class="value">{{ c.containers }}</div>
+            <div class="value-label">Conteneur(s)</div>
+          </div>
+          <div class="val-block">
+            <div class="value">{{ c.orders }}</div>
+            <div class="value-label">Ordre(s)</div>
+          </div>
+        </div>
+
+        <div class="card-bottom-bar"></div>
+      </vs-card>
     </div>
   </div>
 </template>
 
-// ...existing code...
 <script>
 export default {
   name: "ImportPage",
   data() {
     return {
-      dateStart: "",
-      dateEnd: "",
-      companies: []
+      value1:null,
+      
+      companies: [
+        { name: "AGL", stock: "", containers: "", orders: ""},
+        { name: "ARKAS SOGENA", stock: "", containers: "", orders: "" },
+        { name: "CMA CGM", stock: "", containers: "", orders: "" },
+        { name: "EVERGREEN", stock: "", containers: "", orders: "" },
+        
+        
+      ]
     };
   },
   methods: {
-    onFilter() {
-      // déclenche le chargement en utilisant les dates du composant
-      this.loadCompaniesBetween();
+    onDateChange(val) {
+      if (Array.isArray(val) && val.length === 2) {
+        this.dateStart = val[0];
+        this.dateEnd = val[1];
+      } else {
+        this.dateStart = "";
+        this.dateEnd = "";
+      }
     },
-    // Retiré les paramètres inutilisés 'start' et 'end'
-    loadCompaniesBetween() {
-      // placeholder : utiliser this.dateStart / this.dateEnd pour filtrer
-      // Exemple de test (remplace par appel API réel)
-      // this.companies = [...]
+    onFilter() {
+      // placeholder: ici tu peux appeler ton API en utilisant this.dateStart / this.dateEnd
+      // pour l'exemple on ne modifie pas companies
+      // console.log('Filter dates', this.dateStart, this.dateEnd)
     }
   }
 };
 </script>
-// ...existing code...
 
 <style scoped>
-.import-page { padding: 0 18px 40px 18px; }
-
-/* header */
-.import-header {
+.import-page { padding: 0 ;margin: -16px; }
+/* header card */
+/* header card container */
+.header-card {
   position: relative;
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px 22px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(60,60,60,0.06);
+  overflow: visible; /* important: éviter de couper le bouton */
+}
+
+/* bottom red bar */
+.header-bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 4px;
+  background: #d87d85;
+  border-radius: 0 0 8px 8px;
+  z-index: 1;
+}
+
+/* header layout */
+.import-header {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-bottom: 10px;
-  padding: 22px 28px;
-  height: 84px;
-  box-sizing: border-box;
-  background: #fff;
+  width: 100%;
+  z-index: 2; /* au-dessus de la barre rouge */
 }
 
-/* titre principal */
-.section-title { display:flex; align-items:center; gap:10px; }
-.title-dossiers { color: #c32d39; font-size: 22px; font-weight:700; }
-.title-sub { color:#222; font-size:22px; font-weight:700; }
+/* left block (titre + date) occupe l'espace disponible */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1 1 auto;
+}
+
+/* pousse le bouton à l'extrême droite */
+.history-btn {
+  margin-left: auto;
+  padding: 10px 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;   /* empêche le texte d'être cassé */
+  min-width: 110px;      /* assure espace suffisant pour "Historique" */
+  z-index: 3;
+  overflow: visible;
+}
+
+/* si tu avais une version "history-btn-left", la cacher */
+.history-btn-left { display: none !important; }
+
+.section-title { display:flex; align-items:flex-start; gap:8px; font-weight:700; font-size:30px; }
+.title-dossiers { color:#c32d39; }
+.title-sub { color:#222; }
+.slash { margin: 0 6px; color: rgba(0,0,0,0.45); }
 
 /* date range */
 .date-search { display:flex; align-items:center; margin-left:24px; }
@@ -142,27 +205,16 @@ export default {
   display:flex;
   align-items:center;
   gap:12px;
-  background:#fff;
-  border:1px solid rgba(195,45,57,0.12);
-  border-radius:28px;
+  background:#fff;  
   padding:8px 14px;
-  height:48px;
 }
 .calendar-icon{ color: rgba(0,0,0,0.35); font-size:20px; margin-right:6px; }
+.block { display:flex; align-items:center; gap:10px; height: 100px; }
 
-/* vs-input inline appearance */
-.date-box .date-input { width:220px; max-width:220px; }
-.date-box .date-input .vs-input__container,
-.date-box .date-input input {
-  border: none !important;
-  background: transparent !important;
-  padding: 6px 8px !important;
-  font-size:14px;
-  color: #333;
-  box-shadow: none !important;
-}
 
-.date-sep{ color:#666; font-size:14px; margin:0 8px; }
+/* el-date-picker styling */
+.el-range-picker { width:420px; max-width:100%; background:transparent; }
+.el-range-picker .el-input__inner { border:none; padding:6px 8px; font-size:14px; background:transparent; box-shadow:none; }
 
 /* search round button */
 .search-circle{
@@ -179,34 +231,17 @@ export default {
 }
 .search-circle .material-icons{ font-size:20px; color:#666; }
 
-/* historique bouton positionné comme la maquette */
-.history-btn {
-  position: absolute;
-  left: 22px;
-  top: 54px;
-  padding: 10px 22px;
-  font-weight: 600;
-  border-radius: 8px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+
 
 /* sous-titre */
-.import-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 18px 0 10px 12px;
-  color: #222;
-  text-align: left;
-}
+.import-title { font-size: 18px; font-weight: 600; margin: 18px 0 10px 12px; color: #222; text-align:left; }
+.import-sub { color:#222; font-weight:700; }
 
 /* cards grid */
 .companies-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
-  gap: 32px 24px;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 28px 22px;
   margin-top: 10px;
 }
 
@@ -222,30 +257,21 @@ export default {
 .company-name { font-weight:600; font-size:18px; color:#222; }
 
 .company-status { display:flex; gap:48px; margin-bottom:10px; justify-content:flex-start; }
-.status-title { font-size:16px; font-weight:500; color:#757575; margin-left:4px; }
+.status-block { display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+.status-label { font-size:16px; font-weight:500; color:#757575; margin-top:6px; }
 
-.company-values { display:flex; gap:48px; margin-bottom:8px; justify-content:flex-start; }
-.value { font-size:20px; font-weight:700; color:#222; margin-right:4px; }
+.company-values { display:flex; gap:48px; margin-bottom:8px; justify-content:flex-start; align-items:flex-end; }
+.val-block { display:flex; flex-direction:column; align-items:flex-start; }
+.value { font-size:20px; font-weight:700; color:#222; margin-bottom:6px; }
 .value-label { font-size:15px; color:#757575; }
 
-.card-bottom-bar { position:absolute; left:0; bottom:0; width:100%; height:5px; background:#43a047; border-radius:0 0 12px 12px; }
-
-/* placeholder empty */
-.empty-placeholder {
-  grid-column: 1 / -1;
-  padding: 40px;
-  border: 1px dashed #eee;
-  border-radius: 8px;
-  text-align: center;
-  color: #888;
-  background: #fafafa;
-}
+.card-bottom-bar { position:absolute; left:0; bottom:0; width:100%; height:4px; background:#2dc732; border-radius:0 0 12px 12px; }
 
 /* responsive tweaks */
 @media (max-width: 900px) {
-  .date-box .date-input { width:160px; max-width:160px; }
-  .section-title .title-dossiers,
-  .section-title .title-sub { font-size:18px; }
-  .history-btn { left: 12px; top: 56px; padding:8px 16px; }
+  .el-range-picker { width:300px; }
+  .section-title { font-size:18px; }
+  .history-btn { left:12px; top:56px; padding:8px 16px; }
+  .companies-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 }
 </style>
