@@ -1,8 +1,9 @@
+<!-- Navbar.vue -->
 <template>
   <nav class="navbar">
-    <!-- Bloc 1 : Bouton menu + menu flottant -->
     <div class="bloc bloc-gauche">
-      <button class="menu-btn" @click="toggleMenu">
+      <!-- ✅ Modifier ici : clic déclenche toggle-sidebar -->
+      <button class="menu-btn" @click="$emit('toggle-sidebar')">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
           <rect x="3" y="3" width="4" height="4"></rect>
           <rect x="10" y="3" width="4" height="4"></rect>
@@ -15,20 +16,11 @@
           <rect x="17" y="17" width="4" height="4"></rect>
         </svg>
       </button>
-      <span class="brand">{{ brandText }}</span>
 
-      <!-- Menu flottant -->
-      <transition name="fade">
-        <div v-if="menuVisible" class="dropdown-menu">
-          <div class="arrow"></div>
-          <ul>
-            <li v-for="item in dropdownItems" :key="item">{{ item }}</li>
-          </ul>
-        </div>
-      </transition>
+      <span class="brand">{{ brandText }}</span>
     </div>
 
-    <!-- Bloc 2 : Menu central -->
+    <!-- Menu central -->
     <ul class="bloc bloc-centre">
       <li
         v-for="item in menuItems"
@@ -41,7 +33,7 @@
       </li>
     </ul>
 
-    <!-- Bloc 3 : Nom utilisateur + bouton déconnexion -->
+    <!-- Menu droit -->
     <div class="bloc bloc-droit">
       <span class="username">{{ userName }}</span>
       <button class="logout-btn" @click="$emit('logout')">Déconnexion</button>
@@ -57,10 +49,10 @@ export default {
     brandText: { type: String, default: 'ENTREPRISE' },
     activeKey: { type: String, default: 'dashboard' }
   },
+  emits: ['nav', 'toggle-sidebar'], // 👈 Déclaration de l'événement
   data() {
     return {
-      menuVisible: false,
-      dropdownItems: ['Entreprise', 'Option 2', 'Option 3'],
+      // ❌ menuVisible supprimé
       menuItems: [
         {
           key: 'dashboard',
@@ -91,15 +83,13 @@ export default {
     }
   },
   methods: {
-    toggleMenu() {
-      this.menuVisible = !this.menuVisible;
-    },
     navigate(item) {
       this.$emit('nav', item.key)
     }
   }
 }
 </script>
+
 
 <style scoped>
 /* Material Icons */
