@@ -25,6 +25,9 @@
       <!-- Contenu principal -->
       <div class="content">
         <router-view />
+        <HelloWorld />
+        <ImportPage /><hr>
+        <Table_dossier />
       </div>
     </div>
   </div>
@@ -34,12 +37,18 @@
 <script>
 import Navbar from './components/menu/nav_barre.vue'
 import Sidebar from './components/menu/sidebar.vue' // 
+import Table_dossier from './components/table/Table_dossier.vue'
+import ImportPage from './components/pages/ImportPage.vue'
+import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
     Navbar,
-    Sidebar
+    ImportPage,
+    HelloWorld,
+    Sidebar,
+    Table_dossier
   },
   data() {
     return {

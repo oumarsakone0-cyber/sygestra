@@ -148,11 +148,12 @@ export default {
   position: relative;
   background: #fff;
   border-radius: 8px;
-  padding: 16px 22px 20px;
-  margin-bottom: 18px;
+  padding: 0;
+  margin-bottom: 10px;
   box-shadow: 0 2px 8px rgba(60,60,60,0.06);
   overflow: visible;
-  
+  min-width: min-content;
+  min-height: min-content;
 }
 
 /* Red bottom accent */
@@ -277,7 +278,8 @@ export default {
 
 /* Company card */
 .company-card {
-  min-height: 220px;
+  max-width: max-content;
+  min-height: 200px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(60,60,60,0.07);
   position: relative;
@@ -286,17 +288,17 @@ export default {
   overflow: hidden;
   word-break: break-word;
 }
-.company-card-header { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:600; margin-bottom:12px; }
-.company-name { font-weight:600; font-size:16px; color:#222; }
+.company-card-header { display:flex; align-items:center; gap:10px; font-size:40px; font-weight:600; margin-bottom:12px; }
+.company-name { font-weight:600; font-size:28px; color:#222; }
 
 /* Status / values */
 .company-status { display:flex; gap:36px; margin-bottom:10px; align-items:flex-start; }
 .status-block { display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
-.status-label { font-size:14px; font-weight:500; color:#757575; margin-top:6px; }
+.status-label { font-size:26px; font-weight:500; color:#757575; margin-top:6px; }
 
 .company-values { display:flex; gap:36px; margin-bottom:8px; align-items:flex-end; }
-.value { font-size:18px; font-weight:700; color:#222; margin-bottom:6px; }
-.value-label { font-size:13px; color:#757575; }
+.value { font-size:28px; font-weight:700; color:#222; margin-bottom:6px; }
+.value-label { font-size:24px; color:#757575; }
 
 /* Card bottom bar */
 .card-bottom-bar { position:absolute; left:0; bottom:0; width:100%; height:4px; background:#2dc732; border-radius:0 0 12px 12px; }
