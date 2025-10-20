@@ -128,11 +128,13 @@ export default {
 
 /* Desktop static sidebar visible only on desktop when open */
 .sidebar.static {
-  width: 80vw; /* élargi à 80% */
-  max-width: 1200px;
+  width: 15vw; /* 15% pour desktop (30% divisé par 2) */
+  max-width: 300px;
   background-color: #f0f0f0;
   padding: 0;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  position: static; /* pousse le contenu au lieu d'être en overlay */
+  height: 100vh;
 }
 
 .content {
