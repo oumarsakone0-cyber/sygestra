@@ -148,12 +148,12 @@ export default {
   position: relative;
   background: #fff;
   border-radius: 8px;
-  padding: 0;
+  padding: 10px 20px 20px 20px;
   margin-bottom: 10px;
   box-shadow: 0 2px 8px rgba(60,60,60,0.06);
   overflow: visible;
-  min-width: min-content;
-  min-height: min-content;
+  width: 100%;
+  max-height: max-content;
 }
 
 /* Red bottom accent */
@@ -162,7 +162,7 @@ export default {
   left: 0;
   right: 0;
   bottom: -6px;
-  height: 6px;
+  height: 4px;
   background: #d87d85;
   border-radius: 0 0 8px 8px;
   z-index: 1;
@@ -209,7 +209,7 @@ export default {
   align-items: flex-start;
   gap: 8px;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 28px;
   white-space: nowrap;
 }
 .title-dossiers { color: #c32d39; }
@@ -223,14 +223,13 @@ export default {
   align-items: center;
   gap: 12px;
   background: #fff;
-  border: 1px solid rgba(195,45,57,0.12);
-  border-radius: 28px;
-  padding: 8px 14px;
-  height: 48px;
+  border-radius: 34px;
+  padding: 10px 16px;
+  height: 52px;
   box-sizing: border-box;
-  min-width: 260px;
+  min-width: 300px;
 }
-.calendar-icon { color: rgba(0,0,0,0.35); font-size: 20px; margin-right: 6px; }
+.calendar-icon { color: rgba(0,0,0,0.35); font-size: 28px; margin-right: 6px; }
 .block { display:flex; align-items:center; gap:10px; height: auto; }
 
 /* el-date-picker styling */

@@ -83,44 +83,46 @@ export default {
   methods: {
     async generatePdf(row) {
       try {
-        // dynamic import to avoid build errors if not installed
         const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
-        const res = await fetch("/dossier.pdf"); // put dossier.pdf in public/
-        const existingPdfBytes = await res.arrayBuffer();
-        const pdfDoc = await PDFDocument.load(existingPdfBytes);
-        const page = pdfDoc.getPages()[0];
+
+        // Créer un PDF vierge
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage([595, 842]); // A4
         const { height } = page.getSize();
         const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
         const fontSize = 11;
         const leftX = 40;
-        let y = height - 80;
+        let y = height - 60;
 
-        page.drawText(`N° Dossier: ${row.numero}`, { x: leftX, y, size: fontSize, font: helv, color: rgb(0,0,0) });
-        y -= 16;
-        page.drawText(`Reception: ${row.reception || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`BADT: ${row.badt || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`Client: ${row.client || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`Armateur: ${row.armateur || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`TC(s): ${row.tcs || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`Scan: ${row.scan ? "Oui" : "Non"}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`Livré: ${row.livre ? "Oui" : "Non"}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`Récup: ${row.recup ? "Oui" : "Non"}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`ZONE: ${row.zone || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`DECLARATION: ${row.declaration || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`BL: ${row.bl || ""}`, { x: leftX, y, size: fontSize, font: helv });
-        y -= 16;
-        page.drawText(`Type: ${row.type || ""}`, { x: leftX, y, size: fontSize, font: helv });
+        // Titre
+        page.drawText("FICHE DOSSIER", { x: leftX, y, size: 18, font: helv, color: rgb(0,0,0.8) });
+        y -= 30;
 
+        // Infos de la ligne sélectionnée
+        const infos = [
+          `N° Dossier: ${row.numero}`,
+          `Sub: ${row.sub || ""}`,
+          `Reception: ${row.reception || ""}`,
+          `BADT: ${row.badt || ""}`,
+          `Client: ${row.client || ""}`,
+          `Armateur: ${row.armateur || ""}`,
+          `TC(s): ${row.tcs || ""}`,
+          `Scan: ${row.scan ? "Oui" : "Non"}`,
+          `Livré: ${row.livre ? "Oui" : "Non"}`,
+          `Récup: ${row.recup ? "Oui" : "Non"}`,
+          `ZONE: ${row.zone || ""}`,
+          `DECLARATION: ${row.declaration || ""}`,
+          `BL: ${row.bl || ""}`,
+          `Type: ${row.type || ""}`
+        ];
+
+        infos.forEach(info => {
+          page.drawText(info, { x: leftX, y, size: fontSize, font: helv, color: rgb(0,0,0) });
+          y -= 16;
+        });
+
+        // Télécharger le PDF
         const pdfBytes = await pdfDoc.save();
         const blob = new Blob([pdfBytes], { type: "application/pdf" });
         const url = URL.createObjectURL(blob);
@@ -131,12 +133,13 @@ export default {
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
+
       } catch (err) {
-        /* Keep message short */
         console.error(err);
-        alert("Erreur génération PDF. Vérifie pdf-lib et public/dossier.pdf");
+        alert("Erreur génération PDF.");
       }
     }
+
   }
 };
 </script>

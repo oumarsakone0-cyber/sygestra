@@ -26,7 +26,8 @@
       <div class="content">
         <router-view />
         <HelloWorld />
-        <ImportPage /><hr>
+        <ImportPage />
+        <br><br><hr><br><br>
         <Table_dossier />
       </div>
     </div>
