@@ -42,6 +42,9 @@ import Table_dossier from './components/table/Table_dossier.vue'
 import ImportPage from './components/pages/ImportPage.vue'
 import HelloWorld from './components/HelloWorld.vue'
 
+
+
+
 export default {
   name: 'App',
   components: {
@@ -49,7 +52,8 @@ export default {
     ImportPage,
     HelloWorld,
     Sidebar,
-    Table_dossier
+    Table_dossier,
+    
   },
   data() {
     return {
