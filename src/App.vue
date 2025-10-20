@@ -113,9 +113,10 @@ export default {
 }
 .sidebar-overlay.no-dim { background: transparent; }
 .sidebar.floating {
-  width: 260px;
+  width: 80vw; /* élargi à 80% */
+  max-width: 1200px;
   background-color: #f0f0f0;
-  padding: 20px;
+  padding: 0;
   box-shadow: 4px 0 18px rgba(0,0,0,0.22);
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
@@ -123,9 +124,10 @@ export default {
 
 /* Desktop static sidebar visible only on desktop when open */
 .sidebar.static {
-  width: 260px;
+  width: 80vw; /* élargi à 80% */
+  max-width: 1200px;
   background-color: #f0f0f0;
-  padding: 20px;
+  padding: 0;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
@@ -156,5 +158,4 @@ export default {
   cursor: pointer;
   border-radius: 4px;
 }
-
 </style>

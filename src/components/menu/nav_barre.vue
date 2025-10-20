@@ -230,7 +230,7 @@ export default {
   cursor: pointer;
 }
 .menu-btn.desktop-grid {
-  width: 48px;
+  width: 76px; /* enlarged */
   height: 48px;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
@@ -243,6 +243,7 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .brand {
   padding: 0 20px;
   font-weight: bold;
@@ -367,17 +368,10 @@ export default {
   .bloc-centre li[data-key="dashboard"] { display: none; }
   .brand { padding: 0 8px; font-size: 13px; }
   .username { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .menu-btn { width: 50px; height: 48px; }
+  .menu-btn { width: 60px; height: 48px; } /* larger on mobile */
   .logout-btn { padding: 8px 10px; }
   /* Spécificités mobile navbar */
   .username, .logout-btn { display: none; }
-}
-/* visibility helpers */
-.desktop-only { display: inline-flex; }
-.mobile-only { display: none; }
-@media (max-width: 680px) {
-  .desktop-only { display: none; }
-  .mobile-only { display: inline-flex; }
 }
 
 /* Bottom bar */
@@ -388,8 +382,8 @@ export default {
   bottom: 0;
   display: none; /* visible en mobile */
   justify-content: center;
-  align-items: flex-end;
-  height: 80px;
+  align-items: center;
+  height: 64px;
   z-index: 1050;
   background: transparent;
   padding: 0 15px 10px;
@@ -403,7 +397,7 @@ export default {
   box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
   align-items: center;
   flex: 1;
-  max-width: calc(100vw - 30px);
+  max-width: calc(100vw - 16px);
 }
 .bottom-bar .bottom-group li {
   display: flex;
@@ -420,7 +414,7 @@ export default {
   justify-content: center;
   width: 60px;
   height: 60px;
-  margin: 0 15px;
+  margin: 0 20px;
   border-radius: 50%;
   background: #0a7a00;
   color: #fff;
@@ -444,8 +438,8 @@ export default {
   background: transparent;
 }
 .mobile-bar .circle-btn {
-  width: 36px;
-  height: 36px;
+  width: 48px; /* enlarged */
+  height: 48px;
   border-radius: 50%;
   border: none;
   background: #2c2641;
