@@ -96,7 +96,15 @@ export default {
         'trucks': '/trucks'
       }
       if (routeMap[key]) {
-        this.$router.push(routeMap[key])
+        // Check if we're already on the target route to avoid redundant navigation
+        if (this.$route.path !== routeMap[key]) {
+          this.$router.push(routeMap[key]).catch(err => {
+            // Ignore navigation duplicated errors
+            if (err.name !== 'NavigationDuplicated') {
+              console.error(err)
+            }
+          })
+        }
       }
     },
     toggleSidebar() {

@@ -19,7 +19,6 @@
         </svg>
       </button>
       <span class="brand">{{ brandText }}</span>
-      <span class="firstname">{{ userFirstName }}</span>
     </div>
 
     <!-- Menu central -->
@@ -73,36 +72,35 @@
   </nav>
 
   <!-- Bottom bar mobile -->
-  <nav class="bottom-bar">
-    <ul class="bottom-group left">
-      <li @click="navigateKey('import')">
-        <span class="material-icons">send</span>
-        <span class="bottom-label">Import</span>
-      </li>
-      <li @click="navigateKey('export')">
-        <span class="material-icons">sync_alt</span>
-        <span class="bottom-label">Export</span>
-      </li>
-    </ul>
-    <button class="fab" @click="navigateKey('dashboard')">
-      <svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2'>
-        <path d='M3 3h7v7H3z'/><path d='M14 3h7v4h-7z'/><path d='M14 10h7v11h-7z'/><path d='M3 11h7v9H3z'/>
-      </svg>
-    </button>
-    <ul class="bottom-group right">
-      <li @click="navigateKey('chauffeurs')">
+  <nav class="bottom-nav">
+    <div class="nav-item" :class="{ active: activeKey === 'import' }" @click="navigateKey('import')">
+      <i class="material-icons">send</i>
+      <span>Import</span>
+    </div>
+
+    <div class="nav-item" :class="{ active: activeKey === 'export' }" @click="navigateKey('export')">
+      <i class="material-icons">sync_alt</i>
+      <span>Export</span>
+    </div>
+
+    <!-- Bouton central flottant -->
+    <div class="center-btn">
+      <button class="center-icon" @click="navigateKey('dashboard')">
         <svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2'>
-          <path d='M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0'/><path d='M6 21v-2a6 6 0 0 1 12 0v2'/>
+          <path d='M3 3h7v7H3z'/><path d='M14 3h7v4h-7z'/><path d='M14 10h7v11h-7z'/><path d='M3 11h7v9H3z'/>
         </svg>
-        <span class="bottom-label">Chauff.</span>
-      </li>
-      <li @click="navigateKey('camions')">
-        <svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2'>
-          <path d='M3 7h10v8H3z'/><path d='M13 10h5l3 3v2h-8'/><circle cx='7.5' cy='18' r='1.5'/><circle cx='17.5' cy='18' r='1.5'/>
-        </svg>
-        <span class="bottom-label">Cam.</span>
-      </li>
-    </ul>
+      </button>
+    </div>
+
+    <div class="nav-item" :class="{ active: activeKey === 'chauffeurs' }" @click="navigateKey('chauffeurs')">
+      <i class="material-icons">person</i>
+      <span>Chauff.</span>
+    </div>
+
+    <div class="nav-item" :class="{ active: activeKey === 'camions' }" @click="navigateKey('camions')">
+      <i class="material-icons">local_shipping</i>
+      <span>Cam.</span>
+    </div>
   </nav>
     </div>
 </template>
@@ -371,58 +369,66 @@ export default {
 }
 
 /* Bottom bar */
-.bottom-bar {
+.bottom-nav {
   position: fixed;
-  left: 0;
-  right: 0;
   bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
   display: none; /* visible en mobile */
-  justify-content: center;
-  align-items: flex-end;
-  height: 80px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 20px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
   z-index: 1050;
-  background: transparent;
-  padding: 0 8px 0;
 }
-.bottom-bar .bottom-group {
-  display: flex;
-  gap: 30px;
-  background: #ffffff;
-  padding: 12px 20px 16px 20px;
-  border-radius: 25px 25px 0 0;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-  align-items: center;
+
+.nav-item {
+  text-align: center;
   flex: 1;
-  max-width: calc(100vw - 16px);
-  margin-bottom: 0;
-}
-.bottom-bar .bottom-group li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 11px;
-  color: #2c3e50;
+  color: #777;
+  font-size: 10px;
   cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
 }
-.bottom-bar .bottom-label { margin-top: 2px; }
-.bottom-bar .fab {
+
+.nav-item i {
+  font-size: 16px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.nav-item.active {
+  color: #2ebd7f; /* vert */
+}
+
+.center-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
-  margin: 0 20px;
-  border-radius: 50%;
-  background: #0a7a00;
-  color: #fff;
+  padding: 4px 8px;
+}
+
+.center-icon {
+  background: #2ebd7f;
   border: none;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  position: relative;
-  z-index: 10;
-  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 @media (max-width: 680px) {
-  .bottom-bar { display: flex; }
+  .bottom-nav { display: flex; }
 }
 
 /* Mobile header inspired by the screenshot */
