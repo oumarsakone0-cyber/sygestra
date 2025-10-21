@@ -29,6 +29,8 @@
         <ImportPage />
         <br><br><hr><br><br>
         <Table_dossier />
+        <br><br><hr><br><br>
+        <Formulaire_dossier />
       </div>
     </div>
   </div>
@@ -41,6 +43,7 @@ import Sidebar from './components/menu/sidebar.vue' //
 import Table_dossier from './components/table/Table_dossier.vue'
 import ImportPage from './components/pages/ImportPage.vue'
 import HelloWorld from './components/HelloWorld.vue'
+import Formulaire_dossier from './components/formulaire_dossier/formulaire_dossier.vue'
 
 
 
@@ -53,6 +56,7 @@ export default {
     HelloWorld,
     Sidebar,
     Table_dossier,
+    Formulaire_dossier
     
   },
   data() {
