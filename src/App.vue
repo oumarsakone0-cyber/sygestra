@@ -25,10 +25,6 @@
       <!-- Contenu principal -->
       <div class="content">
         <router-view />
-        <HelloWorld />
-        <ImportPage />
-        <br><br><hr><br><br>
-        <Table_dossier />
       </div>
     </div>
   </div>
@@ -37,10 +33,7 @@
 
 <script>
 import Navbar from './components/menu/nav_barre.vue'
-import Sidebar from './components/menu/sidebar.vue' // 
-import Table_dossier from './components/table/Table_dossier.vue'
-import ImportPage from './components/pages/ImportPage.vue'
-import HelloWorld from './components/HelloWorld.vue'
+import Sidebar from './components/menu/sidebar.vue'
 
 
 
@@ -49,11 +42,7 @@ export default {
   name: 'App',
   components: {
     Navbar,
-    ImportPage,
-    HelloWorld,
-    Sidebar,
-    Table_dossier,
-    
+    Sidebar
   },
   data() {
     return {
@@ -83,6 +72,17 @@ export default {
   methods: {
     onNav(key) {
       this.currentKey = key
+      // Navigate to the corresponding route
+      const routeMap = {
+        'dashboard': '/',
+        'import': '/import',
+        'export': '/export',
+        'chauffeurs': '/chauffeurs',
+        'trucks': '/trucks'
+      }
+      if (routeMap[key]) {
+        this.$router.push(routeMap[key])
+      }
     },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen
@@ -101,7 +101,8 @@ export default {
 
 .main-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  position: relative;
 }
 
 .sidebar-overlay {
@@ -140,7 +141,17 @@ export default {
 .content {
   flex: 1;
   padding: 20px;
-  overflow: auto;
+  padding-bottom: 100px; /* Space for bottom bar */
+  overflow-y: auto;
+  min-height: calc(100vh - 48px); /* Full height minus navbar */
+  position: relative;
+}
+
+/* Mobile specific padding */
+@media (max-width: 680px) {
+  .content {
+    padding-bottom: 100px; /* Extra space for mobile bottom bar */
+  }
 }
 
 /* Show floating overlay only on mobile, static on desktop */

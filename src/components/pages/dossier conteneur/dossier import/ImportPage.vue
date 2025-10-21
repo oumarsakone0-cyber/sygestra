@@ -37,7 +37,7 @@
         </div>
 
         <!-- historique placed on the right inside header -->
-        <vs-button class="history-btn" icon="list" type="filled" color="#c32d39">
+        <vs-button class="history-btn" icon="list" type="filled" color="#c32d39" @click="goToHistorique">
           Historique
         </vs-button>
       </div>
@@ -128,6 +128,9 @@ export default {
       // placeholder: ici tu peux appeler ton API en utilisant this.dateStart / this.dateEnd
       // pour l'exemple on ne modifie pas companies
       // console.log('Filter dates', this.dateStart, this.dateEnd)
+    },
+    goToHistorique() {
+      this.$router.push('/historique');
     }
   }
 };
