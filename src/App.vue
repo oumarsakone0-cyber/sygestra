@@ -41,7 +41,7 @@
 import Navbar from './components/menu/nav_barre.vue'
 import Sidebar from './components/menu/sidebar.vue' // 
 import Table_dossier from './components/table/Table_dossier.vue'
-import ImportPage from './components/pages/ImportPage.vue'
+import ImportPage from '@/components/pages/dossier conteneur/dossier import/ImportPage.vue';
 import HelloWorld from './components/HelloWorld.vue'
 import Formulaire_dossier from './components/formulaire_dossier/formulaire_dossier.vue'
 
@@ -87,6 +87,17 @@ export default {
   methods: {
     onNav(key) {
       this.currentKey = key
+      // Navigate to the corresponding route
+      const routeMap = {
+        'dashboard': '/',
+        'import': '/import',
+        'export': '/export',
+        'chauffeurs': '/chauffeurs',
+        'trucks': '/trucks'
+      }
+      if (routeMap[key]) {
+        this.$router.push(routeMap[key])
+      }
     },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen
@@ -105,7 +116,8 @@ export default {
 
 .main-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  position: relative;
 }
 
 .sidebar-overlay {
@@ -132,17 +144,29 @@ export default {
 
 /* Desktop static sidebar visible only on desktop when open */
 .sidebar.static {
-  width: 80vw; /* élargi à 80% */
-  max-width: 1200px;
+  width: 15vw; /* 15% pour desktop (30% divisé par 2) */
+  max-width: 300px;
   background-color: #f0f0f0;
   padding: 0;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  position: static; /* pousse le contenu au lieu d'être en overlay */
+  height: 100vh;
 }
 
 .content {
   flex: 1;
   padding: 20px;
-  overflow: auto;
+  padding-bottom: 100px; /* Space for bottom bar */
+  overflow-y: auto;
+  min-height: calc(100vh - 48px); /* Full height minus navbar */
+  position: relative;
+}
+
+/* Mobile specific padding */
+@media (max-width: 680px) {
+  .content {
+    padding-bottom: 100px; /* Extra space for mobile bottom bar */
+  }
 }
 
 /* Show floating overlay only on mobile, static on desktop */

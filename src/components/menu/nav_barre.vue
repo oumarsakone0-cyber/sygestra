@@ -38,21 +38,6 @@
 
     <!-- Menu droit -->
     <div class="bloc bloc-droit">
-      <!-- Bouton menu pour mobile (dropdown/side menu) -->
-      <button class="menu-btn mobile-only" @click="$emit('toggle-sidebar')">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-          <rect x="3" y="3" width="4" height="4"></rect>
-          <rect x="10" y="3" width="4" height="4"></rect>
-          <rect x="17" y="3" width="4" height="4"></rect>
-          <rect x="3" y="10" width="4" height="4"></rect>
-          <rect x="10" y="10" width="4" height="4"></rect>
-          <rect x="17" y="10" width="4" height="4"></rect>
-          <rect x="3" y="17" width="4" height="4"></rect>
-          <rect x="10" y="17" width="4" height="4"></rect>
-          <rect x="17" y="17" width="4" height="4"></rect>
-        </svg>
-      </button>
-
       <span class="username">
         <span class="material-icons user-icon">person</span>
         {{ userName }}
@@ -64,7 +49,7 @@
     </div>
     <!-- Mobile header (exact style like the photo) -->
     <div class="mobile-bar">
-      <button class="circle-btn" @click="$emit('toggle-sidebar')" aria-label="Ouvrir le menu">
+      <button class="mobile-menu-btn" @click="$emit('toggle-sidebar')" aria-label="Ouvrir le menu">
         <span class="material-icons">menu</span>
       </button>
       <div class="mobile-text">
@@ -244,6 +229,17 @@ export default {
   height: 100%;
 }
 
+/* Desktop only elements */
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 680px) {
+  .desktop-only {
+    display: none;
+  }
+}
+
 .brand {
   padding: 0 20px;
   font-weight: bold;
@@ -382,22 +378,23 @@ export default {
   bottom: 0;
   display: none; /* visible en mobile */
   justify-content: center;
-  align-items: center;
-  height: 64px;
+  align-items: flex-end;
+  height: 80px;
   z-index: 1050;
   background: transparent;
-  padding: 0 15px 10px;
+  padding: 0 8px 0;
 }
 .bottom-bar .bottom-group {
   display: flex;
   gap: 30px;
   background: #ffffff;
-  padding: 12px 20px;
-  border-radius: 25px;
+  padding: 12px 20px 16px 20px;
+  border-radius: 25px 25px 0 0;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
   align-items: center;
   flex: 1;
   max-width: calc(100vw - 16px);
+  margin-bottom: 0;
 }
 .bottom-bar .bottom-group li {
   display: flex;
@@ -437,6 +434,28 @@ export default {
   padding: 0 12px;
   background: transparent;
 }
+.mobile-menu-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #2c2641;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: #3d3650;
+}
+
+.mobile-menu-btn .material-icons {
+  font-size: 24px;
+}
+
 .mobile-bar .circle-btn {
   width: 48px; /* enlarged */
   height: 48px;
