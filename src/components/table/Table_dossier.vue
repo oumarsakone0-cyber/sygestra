@@ -1,489 +1,873 @@
 <template>
-  <div class="table-dossier">
-    <!-- Added header with title, export button, and BADT badge -->
-    <div class="table-header">
+  <div class="tableau-dossiers">
+    <!-- En-tête avec titre et boutons -->
+    <div class="header-section">
       <div class="header-left">
-        <h2 class="title">LISTE DES DOSSIERS</h2>
-        <button class="export-btn">
-          <i class="material-icons">description</i>
+        <h1 class="title">
+          LISTE DES DOSSIERS
+          
+        </h1>
+        <vs-button 
+          color="success" 
+          type="filled"
+          @click="exporterExcel"
+          class="btn-exporter"
+        >
           EXPORTER
-        </button>
+        </vs-button>
+        <!-- Bouton BADT du jour -->
+        <vs-button 
+          color="danger" 
+          @click="showModalBADT = true"
+        >
+          BADT du jour: {{ badtCount }}fcs
+        </vs-button>
+
       </div>
-      <vs-button class="badt-badge" @click="voirBADT">
-        BADT du jour: {{ badtCount }}/cs
-      </vs-button>
-
-
+      <div class="header-right">
+        <vs-input 
+          v-model="searchQuery" 
+          placeholder="Rechercher..."
+          icon="search"
+          class="search-input"
+        />
+      </div>
     </div>
+    <!-- MODALE BADT -->
+    <div v-if="showModalBADT" class="badt-modal-overlay">
+      <div class="modal-content-custom">
+        <!-- Header -->
+        <div class="modal-header">
+          <h3>LISTE DES BADT DU JOUR</h3>
+          <div class="modal-header-buttons">
+            <vs-button color="success" @click="exporterExcel">EXPORTER</vs-button>
+            <vs-button color="danger" @click="showModalBADT = false">✖</vs-button>
+          </div>
+        </div>
 
-    <vs-table stripe :data="computedRows">
-      <template slot="thead">
-        <vs-th>N° Dossier</vs-th>
-        <vs-th>Reception</vs-th>
-        <vs-th>BADT</vs-th>
-        <vs-th>Client</vs-th>
-        <vs-th>Armateur</vs-th>
-        <vs-th>TC(s)</vs-th>
-        <vs-th>Scan</vs-th>
-        <vs-th>Livré</vs-th>
-        <vs-th>Récup</vs-th>
-        <vs-th>ZONE</vs-th>
-        <vs-th>DECLARATION</vs-th>
-        <vs-th>BL</vs-th>
-        <vs-th>Type</vs-th>
-        <vs-th></vs-th>
-      </template>
+        <!-- Barre de recherche -->
+        <vs-input 
+          v-model="searchQuerybadt"
+          placeholder="Rechercher..."
+          icon="search"
+          class="modal-search-input"
+        />
 
-      <template slot-scope="{ data }">
-        <vs-tr v-for="(row, idx) in data" :key="row.id || idx">
-          <vs-td>
-            <!-- Updated pill design to match image -->
-            <button class="dossier-pill" @click="generatePdf(row)" :title="'Télécharger PDF: ' + row.numero">
-              {{ row.numero }}
-            </button>
-          </vs-td>
+        <!-- Tableau BADT -->
+        <div class="modal-table-container">
+          <table class="dossiers-table">
+            <thead>
+              <tr>
+                <th>N° Dossier</th>
+                <th>Reception</th>
+                <th>BADT</th>
+                <th>Client</th>
+                <th>Armateur</th>
+                <th>TC(s)</th>
+                <th>Scan</th>
+                <th>Livré</th>
+                <th>Récup</th>
+                <th>ZONE</th>
+                <th>DECLARATION</th>
+                <th>BL</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="dossier in filteredBadtToday" :key="dossier.id">
+                <td>{{ dossier.numero }}</td>
+                <td>{{ dossier.dateReception }}</td>
+                <td class="col-badt">{{ dossier.badt }}</td>
+                <td>{{ dossier.client }}</td>
+                <td>{{ dossier.armateur }}</td>
+                <td class="text-center">{{ dossier.tcs }}</td>
+                <td class="text-center">{{ dossier.scan }}</td>
+                <td class="text-center">{{ dossier.livre }}</td>
+                <td class="text-center">{{ dossier.recup }}</td>
+                <td>{{ dossier.zone }}</td>
+                <td>{{ dossier.declaration }}</td>
+                <td>{{ dossier.bl }}</td>
+                <td class="text-center">{{ dossier.type }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Tableau des dossiers -->
+    <div class="table-container">
+      <table class="dossiers-table">
+        <thead>
+          <tr>
+            <th>N° Dossier</th>
+            <th>Reception</th>
+            <th>BADT</th>
+            <th>Client</th>
+            <th>Armateur</th>
+            <th>TC(s)</th>
+            <th>Scan</th>
+            <th>Livré</th>
+            <th>Récup</th>
+            <th>ZONE</th>
+            <th>DECLARATION</th>
+            <th>BL</th>
+            <th>Type</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="dossier in filteredDossiers" :key="dossier.id">
+            <!-- N° Dossier - Pastille rose cliquable -->
+            <td>
+              <div 
+                class="dossier-pill"
+                @click="genererPDF(dossier)"
+              >
+                {{ dossier.numero }}
+              </div>
+            </td>
+            
+            <!-- Date Reception -->
+            <td class="col-reception">
+              {{ dossier.dateReception }}
+            </td>
+            
+            <!-- BADT - Case bleue avec texte rouge -->
+            <td class="col-badt">
+              {{ dossier.badt }}
+            </td>
 
-          <vs-td>{{ row.reception }}</vs-td>
-          <vs-td>
-            <!-- Updated BADT styling with light blue background and red text -->
-            <div class="badt-cell">
-              <span class="badt-date">{{ row.badt }}</span>
-            </div>
-          </vs-td>
-          <vs-td>{{ row.client }}</vs-td>
-          <vs-td class="armateur-cell">{{ row.armateur }}</vs-td>
-          <vs-td class="cell-center">{{ row.tcs }}</vs-td>
-          <vs-td class="cell-center">
-            <!-- Show 0 or number for scan -->
-            <span :class="row.scan > 0 ? 'value-positive' : 'value-zero'">{{ row.scan || 0 }}</span>
-          </vs-td>
-          <vs-td class="cell-center">
-            <!-- Added green checkmark with number for Livré -->
-            <div v-if="row.livre > 0" class="check-value">
-              <i class="material-icons check-icon">check</i>
-              <span class="check-number">{{ row.livre }}</span>
-            </div>
-            <span v-else class="value-zero">0</span>
-          </vs-td>
-          <vs-td class="cell-center">
-            <!-- Added green checkmark with number for Récup -->
-            <div v-if="row.recup > 0" class="check-value">
-              <i class="material-icons check-icon">check</i>
-              <span class="check-number">{{ row.recup }}</span>
-            </div>
-            <span v-else class="value-zero">0</span>
-          </vs-td>
-          <vs-td>{{ row.zone }}</vs-td>
-          <vs-td>
-            <!-- Styled declaration as blue link -->
-            <span class="declaration-link">{{ row.declaration }}</span>
-          </vs-td>
-          <vs-td>
-            <!-- Styled BL as blue link -->
-            <span class="bl-link">{{ row.bl }}</span>
-          </vs-td>
-          <vs-td class="cell-type">
-            <span class="type-text">{{ row.type }}</span>
-          </vs-td>
-          <vs-td>
-            <!-- Updated view button to blue circular icon -->
-            <button class="view-btn" @click="$emit('view', row)" title="Voir">
-              <i class="material-icons">visibility</i>
-            </button>
-          </vs-td>
-        </vs-tr>
-      </template>
-    </vs-table>
+
+            
+            <!-- Client -->
+            <td>{{ dossier.client }}</td>
+            
+            <!-- Armateur -->
+            <td>{{ dossier.armateur }}</td>
+            
+            <!-- TC(s) -->
+            <td class="text-center">{{ dossier.tcs }}</td>
+            
+            <!-- Scan -->
+            <td class="text-center">{{ dossier.scan }}</td>
+            
+            <!-- Livré - Coche verte avec nombre -->
+            <td class="text-center">
+              <div v-if="dossier.livre > 0" class="check-cell">
+                <span class="check-icon">✓</span>
+                <span class="check-number">{{ dossier.livre }}</span>
+              </div>
+              <span v-else>{{ dossier.livre }}</span>
+            </td>
+            
+            <!-- Récup - Coche verte avec nombre -->
+            <td class="text-center">
+              <div v-if="dossier.recup > 0" class="check-cell">
+                <span class="check-icon">✓</span>
+                <span class="check-number">{{ dossier.recup }}</span>
+              </div>
+              <span v-else>{{ dossier.recup }}</span>
+            </td>
+            
+            <!-- ZONE -->
+            <td>{{ dossier.zone }}</td>
+            
+            <!-- DECLARATION - Lien bleu -->
+            <td>
+              <a :href="`#${dossier.declaration}`" class="link-blue">
+                {{ dossier.declaration }}
+              </a>
+            </td>
+            
+            <!-- BL - Lien bleu -->
+            <td>
+              <a :href="`#${dossier.bl}`" class="link-blue">
+                {{ dossier.bl }}
+              </a>
+            </td>
+            
+            <!-- Type -->
+            <td class="text-center">
+              <span class="type-badge">{{ dossier.type }}</span>
+            </td>
+            
+            <!-- Bouton Voir - Cercle bleu -->
+            <td>
+              <vs-button 
+                color="primary" 
+                type="filled"
+                icon="visibility"
+                circle
+                @click="voirDossier(dossier)"
+                class="btn-voir"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "TableDossier",
-  props: {
-    rows: { type: Array, default: () => [] }
-  },
+  name: 'TableauDossiers',
   data() {
     return {
-      sampleRows: [
-        { 
-          id: 1, 
-          numero: "12/24 - PM 14", 
-          reception: "2024-12-26", 
-          badt: "2024-12-26", 
-          client: "ACTIVA TRADE", 
-          armateur: "PROPRE MOYEN", 
-          tcs: 4, 
-          scan: 0, 
-          livre: 4, 
-          recup: 0, 
-          zone: "COCODY", 
-          declaration: "C72872", 
-          bl: "COSU5403205400", 
-          type: "4 20'" 
+      showModalBADT: false,
+      searchQuerybadt:'',
+      searchQuery: '',
+      dossierbadt: [
+        {
+          id: 1,
+          numero: '10/25 - PM 14',
+          dateReception: '2024-12-26',
+          badt: '2025-10-29',
+          client: 'ACTIVA TRADE',
+          armateur: 'PROPRE MOYEN',
+          tcs: 4,
+          scan: 0,
+          livre: 4,
+          recup: 0,
+          zone: 'COCODY',
+          declaration: 'C72872',
+          bl: 'COSU5403205400',
+          type: '4 20\'',
+          contact: 'MIENSAH',
+          modeLivraison: 'PROPRE MOYEN',
+          remorque: ''
         },
-        { 
-          id: 2, 
-          numero: "12/24 - PM 13", 
-          reception: "2024-12-26", 
-          badt: "2024-12-28", 
-          client: "AFRICA IMPORT", 
-          armateur: "PROPRE MOYEN", 
-          tcs: 1, 
-          scan: 0, 
-          livre: 1, 
-          recup: 0, 
-          zone: "YOPOUGON", 
-          declaration: "C72376", 
-          bl: "MEDUFS972569", 
-          type: "1 20'" 
+      ],
+      
+      dossiers: [
+        {
+          id: 1,
+          numero: '12/24 - PM 14',
+          dateReception: '2024-12-26',
+          badt: '2024-12-26',
+          client: 'ACTIVA TRADE',
+          armateur: 'PROPRE MOYEN',
+          tcs: 4,
+          scan: 0,
+          livre: 4,
+          recup: 0,
+          zone: 'COCODY',
+          declaration: 'C72872',
+          bl: 'COSU5403205400',
+          type: '4 20\'',
+          contact: 'MIENSAH',
+          modeLivraison: 'PROPRE MOYEN',
+          remorque: ''
         },
-        { 
-          id: 3, 
-          numero: "12/24 - MAE 45", 
-          reception: "2024-12-20", 
-          badt: "", 
-          client: "MEDINEX", 
-          armateur: "Maersk", 
-          tcs: 2, 
-          scan: 0, 
-          livre: 2, 
-          recup: 0, 
-          zone: "BINGERVILLE", 
-          declaration: "C70934", 
-          bl: "246039074", 
-          type: "2 40'" 
+        {
+          id: 2,
+          numero: '12/24 - PM 13',
+          dateReception: '2024-12-26',
+          badt: '2024-12-28',
+          client: 'AFRICA IMPORT',
+          armateur: 'PROPRE MOYEN',
+          tcs: 1,
+          scan: 0,
+          livre: 1,
+          recup: 0,
+          zone: 'YOPOUGON',
+          declaration: 'C72376',
+          bl: 'MEDUFS972569',
+          type: '1 20\'',
+          contact: '',
+          modeLivraison: 'PROPRE MOYEN',
+          remorque: ''
         },
-        { 
-          id: 4, 
-          numero: "12/24 - MAE 44", 
-          reception: "2024-12-18", 
-          badt: "2024-12-20", 
-          client: "", 
-          armateur: "Maersk", 
-          tcs: 1, 
-          scan: 0, 
-          livre: 1, 
-          recup: 1, 
-          zone: "MARCORY AVANT BLD", 
-          declaration: "C70780", 
-          bl: "247128580", 
-          type: "1 40'" 
+        {
+          id: 3,
+          numero: '12/24 - MAE 45',
+          dateReception: '2024-12-20',
+          badt: '',
+          client: 'MEDINEX',
+          armateur: 'Maersk',
+          tcs: 2,
+          scan: 0,
+          livre: 2,
+          recup: 0,
+          zone: 'BINGERVILLE',
+          declaration: 'C70934',
+          bl: '246039074',
+          type: '2 40\'',
+          contact: '',
+          modeLivraison: 'Maersk',
+          remorque: ''
         },
-        { 
-          id: 5, 
-          numero: "12/24 - MAE 43", 
-          reception: "2024-12-18", 
-          badt: "2024-12-20", 
-          client: "GTSE", 
-          armateur: "Maersk", 
-          tcs: 1, 
-          scan: 0, 
-          livre: 1, 
-          recup: 1, 
-          zone: "MARCORY AVANT BLD", 
-          declaration: "C70624", 
-          bl: "246227841", 
-          type: "1 40'" 
+        {
+          id: 4,
+          numero: '12/24 - MAE 44',
+          dateReception: '2024-12-18',
+          badt: '2024-12-20',
+          client: '',
+          armateur: 'Maersk',
+          tcs: 1,
+          scan: 0,
+          livre: 1,
+          recup: 1,
+          zone: 'MARCORY AVANT BLD',
+          declaration: 'C70780',
+          bl: '247128580',
+          type: '1 40\'',
+          contact: '',
+          modeLivraison: 'Maersk',
+          remorque: ''
+        },
+        {
+          id: 5,
+          numero: '12/24 - MAE 43',
+          dateReception: '2024-12-18',
+          badt: '2024-12-20',
+          client: 'GTSE',
+          armateur: 'Maersk',
+          tcs: 1,
+          scan: 0,
+          livre: 1,
+          recup: 1,
+          zone: 'MARCORY AVANT BLD',
+          declaration: 'C70624',
+          bl: '246227841',
+          type: '1 40\'',
+          contact: '',
+          modeLivraison: 'Maersk',
+          remorque: ''
         }
       ]
-    };
+    }
   },
   computed: {
-    computedRows() {
-      return (this.rows && this.rows.length) ? this.rows : this.sampleRows;
+    filteredDossiers() {
+      if (!this.searchQuery) return this.dossiers
+      
+      const query = this.searchQuery.toLowerCase()
+      return this.dossiers.filter(dossier => {
+        return Object.values(dossier).some(value => 
+          String(value).toLowerCase().includes(query)
+        )
+      })
     },
+    badtToday() {
+    const today = new Date().toISOString().split('T')[0];
+    return this.dossierbadt.filter(d => d.badt === today);
+   },
+    filteredBadtToday() {
+      if (!this.badtToday.length) return this.dossierbadt;
+
+      if (!this.searchQuerybadt) return this.badtToday;
+
+      const query = this.searchQuerybadt.toLowerCase();
+      return this.badtToday.filter(dossier =>
+        Object.values(dossier).some(value => 
+          String(value).toLowerCase().includes(query)
+        )
+      );
+    },
+
     badtCount() {
-      return this.computedRows.filter(row => row.badt).length;
+      return this.badtToday.length;
+    
     }
   },
   methods: {
-    voirBADT() {
-      this.sampleRows;
+    exporterExcel() {
+      // Créer le contenu CSV
+      const headers = [
+        'N° Dossier', 'Reception', 'BADT', 'Client', 'Armateur', 
+        'TC(s)', 'Scan', 'Livré', 'Récup', 'ZONE', 
+        'DECLARATION', 'BL', 'Type'
+      ]
+      
+      let csvContent = headers.join(',') + '\n'
+      
+      this.filteredDossiers.forEach(dossier => {
+        const row = [
+          dossier.numero,
+          dossier.dateReception,
+          dossier.badt,
+          dossier.client,
+          dossier.armateur,
+          dossier.tcs,
+          dossier.scan,
+          dossier.livre,
+          dossier.recup,
+          dossier.zone,
+          dossier.declaration,
+          dossier.bl,
+          dossier.type
+        ].map(value => `"${value}"`).join(',')
+        
+        csvContent += row + '\n'
+      })
+      
+      // Télécharger le fichier
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      
+      link.setAttribute('href', url)
+      link.setAttribute('download', `dossiers_${new Date().toISOString().split('T')[0]}.csv`)
+      link.style.visibility = 'hidden'
+      
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      this.$vs.notify({
+        title: 'Export réussi',
+        text: 'Les données ont été exportées en CSV',
+        color: 'success',
+        position: 'top-right'
+      })
     },
-    async generatePdf(row) {
-      try {
-        const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
-        
-
-        const pdfDoc = await PDFDocument.create();
-        const page = pdfDoc.addPage([595, 842]);
-        const { height } = page.getSize();
-        const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-        const fontSize = 11;
-        const leftX = 40;
-        let y = height - 60;
-        
-
-        page.drawText("FICHE DOSSIER", { x: leftX, y, size: 18, font: helv, color: rgb(0,0,0.8) });
-        y -= 30;
-
-        const infos = [
-          `N° Dossier: ${row.numero}`,
-          `Reception: ${row.reception || ""}`,
-          `BADT: ${row.badt || ""}`,
-          `Client: ${row.client || ""}`,
-          `Armateur: ${row.armateur || ""}`,
-          `TC(s): ${row.tcs || ""}`,
-          `Scan: ${row.scan || 0}`,
-          `Livré: ${row.livre || 0}`,
-          `Récup: ${row.recup || 0}`,
-          `ZONE: ${row.zone || ""}`,
-          `DECLARATION: ${row.declaration || ""}`,
-          `BL: ${row.bl || ""}`,
-          `Type: ${row.type || ""}`
-        ];
-
-        infos.forEach(info => {
-          page.drawText(info, { x: leftX, y, size: fontSize, font: helv, color: rgb(0,0,0) });
-          y -= 16;
-        });
-
-        const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `Dossier_${row.numero}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-
-      } catch (err) {
-        console.error(err);
-        alert("Erreur génération PDF.");
-      }
-    }
+    
+    genererPDF(dossier) {
+      // Créer une fenêtre d'impression avec le format SOCOGETRA
+      const printWindow = window.open('', '_blank')
+      
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Dossier ${dossier.numero}</title>
+          <style>
+            @page { margin: 2cm; }
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 20px;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 3px solid #333;
+              padding-bottom: 20px;
+            }
+            .logo {
+              font-size: 48px;
+              font-weight: bold;
+              color: #2c3e50;
+              margin-bottom: 10px;
+            }
+            .company-name {
+              font-size: 14px;
+              color: #666;
+              margin-bottom: 5px;
+            }
+            .company-full {
+              font-size: 11px;
+              color: #999;
+            }
+            .dossier-number {
+              font-size: 36px;
+              font-weight: bold;
+              color: #e91e63;
+              text-align: center;
+              margin: 30px 0;
+              padding: 20px;
+              background: #ffe5f0;
+              border-radius: 10px;
+            }
+            .section {
+              margin-bottom: 25px;
+            }
+            .section-title {
+              font-size: 16px;
+              font-weight: bold;
+              color: #2c3e50;
+              margin-bottom: 15px;
+              padding-bottom: 8px;
+              border-bottom: 2px solid #e0e0e0;
+            }
+            .info-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 15px;
+            }
+            .info-item {
+              display: flex;
+              padding: 10px;
+              background: #f8f9fa;
+              border-radius: 5px;
+            }
+            .info-label {
+              font-weight: bold;
+              color: #555;
+              min-width: 150px;
+            }
+            .info-value {
+              color: #333;
+            }
+            .footer {
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 2px solid #e0e0e0;
+              text-align: center;
+              color: #999;
+              font-size: 11px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="logo">A</div>
+            <div class="company-name">SOCOGETRA</div>
+            <div class="company-full">SOCIETE GENERAL DE COMMERCE ET DE TRANSPORT</div>
+          </div>
+          
+          <div class="dossier-number">${dossier.numero}</div>
+          
+          <div class="section">
+            <div class="section-title">INFORMATIONS GÉNÉRALES</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">DATE RECEPTION:</span>
+                <span class="info-value">${dossier.dateReception}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">BADT:</span>
+                <span class="info-value">${dossier.badt || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">CLIENT:</span>
+                <span class="info-value">${dossier.client || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">ARMATEUR:</span>
+                <span class="info-value">${dossier.armateur}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">DÉTAILS DU TRANSPORT</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">MODE LIVRAISON:</span>
+                <span class="info-value">${dossier.modeLivraison}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">ZONE DE LIVRAISON:</span>
+                <span class="info-value">${dossier.zone}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">REMORQUE:</span>
+                <span class="info-value">${dossier.remorque || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">NBR TCS:</span>
+                <span class="info-value">${dossier.tcs}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">DOCUMENTS</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">NUM BL:</span>
+                <span class="info-value">${dossier.bl}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">DECLARATION:</span>
+                <span class="info-value">${dossier.declaration}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">TYPE:</span>
+                <span class="info-value">${dossier.type}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">CONTACT:</span>
+                <span class="info-value">${dossier.contact || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">STATUT</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">SCAN:</span>
+                <span class="info-value">${dossier.scan}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">LIVRÉ:</span>
+                <span class="info-value">${dossier.livre}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">RÉCUP:</span>
+                <span class="info-value">${dossier.recup}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="footer">
+            Document généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+          </div>
+        </body>
+        </html>
+      `
+      
+      printWindow.document.write(htmlContent)
+      printWindow.document.close()
+      
+      setTimeout(() => {
+        printWindow.print()
+      }, 250)
+    },
+    
+   
   }
-};
+}
 </script>
 
 <style scoped>
-/* Updated all styles to match the provided image design */
-.table-dossier { 
-  font-family: "Montserrat", Arial, sans-serif; 
-  color: #333; 
-  background: #f5f5f5;
-  padding: 20px;
+
+/* Overlay semi-transparent */
+.badt-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 10px;
 }
 
-.table-header {
+/* Modale centrée et grande */
+.modal-content-custom {
+  background: #fff;
+  width: 100%;
+  height: 100%;
+  max-width: 1400px;
+  max-height: 85vh;
+  border-radius: 12px;
+  overflow-y: auto;
+  padding: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+/* Header modale */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.modal-header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Recherche dans la modale */
+.modal-search-input {
+  margin: 10px 0 15px 0;
+  width: 300px;
+}
+
+/* Tableau dans la modale */
+.modal-table-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  width: 100%;
+}
+.tableau-dossiers {
+  padding: 0px;
+  background: #fff;
+}
+
+/* En-tête */
+.header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding: 0 10px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #333;
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.title::before {
-  content: "📊";
-  font-size: 20px;
+.export-icon {
+  font-size: 18px;
 }
 
-.export-btn {
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.3s ease;
-}
-
-.export-btn:hover {
-  background: #45a049;
-  transform: translateY(-1px);
-}
-
-.export-btn .material-icons {
-  font-size: 16px;
-}
-
-.badt-badge {
-  background: #ff5252;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 13px;
+.btn-exporter {
+  background: #4caf50 !important;
   font-weight: 600;
 }
 
-.dossier-pill { 
-  background: #fce4ec; 
-  color: #1976d2; 
-  border: none; 
-  padding: 10px 20px; 
-  border-radius: 25px; 
-  cursor: pointer; 
-  font-weight: 700; 
+.btn-badt {
+  background: #dc3545 !important;
+  font-weight: 600;
+}
+
+.search-input {
+  width: 300px;
+}
+
+/* Tableau */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.dossiers-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.dossiers-table thead {
+  background: #f8f9fa;
+}
+
+.dossiers-table th {
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
   font-size: 13px;
-  transition: all 0.3s ease;
   white-space: nowrap;
 }
 
-.dossier-pill:hover { 
-  transform: translateY(-2px); 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-  background: #f8bbd0;
+.dossiers-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 13px;
 }
 
-.badt-cell {
-  background: #e3f2fd;
-  padding: 8px 12px;
-  border-radius: 6px;
+.dossiers-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Pastille rose pour N° Dossier */
+/* ✅ Nouvelle version : La pastille prend toute la cellule */
+.dossier-pill {
+  background: #ffe5f0;
+  color: #314dea;
+  font-weight: 600;
+  text-align: center;
   display: inline-block;
-  min-width: 90px;
-  text-align: center;
+  padding: 10px 0;
+  width: 100%;
+  border-radius: 12px; /* Option : tu peux mettre 6px */;
+  border: 1px solid #ff99b8;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
 }
 
-.badt-date { 
-  color: #d32f2f; 
-  font-weight: 700;
+.dossier-pill:hover {
+  background: #ffcce0;
+  box-shadow: 0 2px 4px rgba(233, 30, 99, 0.2);
+}
+
+/* ✅ Le TD devient entièrement bleu */
+/* ✅ Le TD devient bleu et conserve son contenu visible */
+td.col-badt {
+  background: #e3f2fd !important;
+  color: red !important;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 !important;
+  vertical-align: middle; /* ✅ centre le contenu */
+  white-space: nowrap;
+  font-size: 13px;
+}
+.col-badt {
+  background: #900c0c !important;
+}
+.col-reception {
+   background: #dde1e2 !important;
+  color: #313939 !important;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 !important;
+  vertical-align: middle; /* ✅ centre le contenu */
+  white-space: nowrap;
   font-size: 13px;
 }
 
-.armateur-cell {
-  color: #666;
-  font-size: 13px;
-}
 
-.cell-center { 
-  text-align: center;
-  vertical-align: middle;
-}
 
-.cell-type {
-  text-align: center;
-}
-
-.type-text {
-  color: #666;
-  font-size: 12px;
-}
-
-.check-value {
+/* Coche verte */
+.check-cell {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
 .check-icon {
   color: #4caf50;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
 }
 
 .check-number {
   color: #4caf50;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.value-zero {
-  color: #f44336;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.value-positive {
-  color: #4caf50;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.declaration-link,
-.bl-link {
-  color: #1976d2;
   font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
+  font-size: 12px;
 }
 
-.declaration-link:hover,
-.bl-link:hover {
+/* Liens bleus */
+.link-blue {
+  color: #2196f3;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-blue:hover {
   text-decoration: underline;
 }
 
-.view-btn { 
-  background: #2196f3; 
-  border: none; 
-  color: white; 
-  width: 42px; 
-  height: 42px; 
-  border-radius: 50%; 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  cursor: pointer; 
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Badge type */
+.type-badge {
+  font-size: 11px;
+  color: #666;
 }
 
-.view-btn:hover { 
-  background: #1976d2; 
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+/* Bouton voir */
+.btn-voir {
+  min-width: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
 }
 
-.view-btn .material-icons {
-  font-size: 20px;
-}
-
-/* Override Vuesax table styles */
-::v-deep .vs-table {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-::v-deep .vs-table-thead {
-  background: #fafafa;
-}
-
-::v-deep .vs-table-thead th {
-  font-weight: 600;
-  color: #555;
-  font-size: 13px;
-  padding: 12px 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-::v-deep .vs-table-tbody tr {
-  transition: all 0.2s ease;
-}
-
-::v-deep .vs-table-tbody tr:hover {
-  background: #f9f9f9;
-}
-
-::v-deep .vs-table-tbody td {
-  padding: 12px 8px;
-  font-size: 13px;
-  color: #333;
+.text-center {
+  text-align: center;
 }
 </style>

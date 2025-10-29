@@ -1,5 +1,6 @@
 <template>
   <div class="historique-page">
+    <br><br>
     <!-- Header card with red bottom bar -->
     <div class="header-card">
       <div class="import-header">

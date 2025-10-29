@@ -1,347 +1,226 @@
 <template>
   <div>
-    <!-- Bouton pour ouvrir la modale -->
-    <vs-button color="primary" type="filled" @click="openModal">
+    <!-- Bouton principal -->
+    <vs-button color="primary" @click="openModal">
       Créer un dossier
     </vs-button>
 
-    <!-- Modale large -->
-    <vs-popup :active.sync="active" title="Création / Modification Dossier" class="popup-large">
-      <div class="form-grid">
+    <!-- Popup Vuesax Full Screen & Transparent -->
+    <vs-popup :active.sync="active" class="popup-full" title="Création / Modification Dossier">
+      <div class="modal-container">
 
-        <!-- Colonne gauche -->
-        <div class="form-column">
-          <vs-input label="Numéro dossier" v-model="form.numero_doc" disabled />
-          <vs-input label="Date de réception" type="date" v-model="form.date_recep" />
-          <vs-input label="Date BADT" type="date" v-model="form.date_badt" />
-          <vs-input label="Client (Entreprise)" v-model="form.client" />
-          <vs-input label="Armateur" v-model="form.armateur" />
-        </div>
+        <!-- Formulaire -->
+        <div class="form-table">
+          <div class="form-row">
+            <vs-input label="Numéro dossier" v-model="form.numero_doc" disabled />
+            <vs-input label="Date réception" type="date" v-model="form.date_recep" />
+            <vs-input label="Date BADT" type="date" v-model="form.date_badt" />
+          </div>
 
-        <!-- Colonne droite -->
-        <div class="form-column">
-          <vs-input label="Déclaration" v-model="form.declaration" />
-          <vs-input label="BL" v-model="form.bl" />
-          <vs-input label="Nb Tcs" type="number" v-model.number="form.nb_tcs" />
-          <vs-input label="Adresse client" v-model="form.adresse_client" />
-          <vs-input label="Contact client" v-model="form.contact_client" />
-        </div>
-      </div>
+          <div class="form-row">
+            <vs-input label="Client" v-model="form.client" />
+            <vs-input label="Contact client" v-model="form.contact_client" />
+            <vs-input label="Adresse client" v-model="form.adresse_client" />
+          </div>
 
-      <!-- Zones dynamiques (sous la grille) -->
-      <div class="zones-section">
-        <div class="zones-header">
-          <h4>Zones & Destinations</h4>
-          <vs-button icon size="small" color="success" @click="addZoneSelect" title="Ajouter une zone">
-            <i class="bx bx-plus"></i>
-          </vs-button>
-        </div>
-
-        <div class="zone-item" v-for="(z, idx) in form.zones" :key="z.id">
-          <div class="zone-row">
-            <!-- Select Zone -->
-            <vs-select
-              v-model="form.zones[idx].zoneId"
-              placeholder="Sélectionner une zone"
-              clearable
-              @change="onZoneChange(idx)"
-            >
-              <vs-option v-for="zone in availableZones" :key="zone.id" :value="zone.id" :label="zone.nom">
-                {{ zone.nom }}
-              </vs-option>
+          <div class="form-row">
+            <vs-select label="Armateur" v-model="form.armateur" placeholder="selectionnez un Armateur">
+              <vs-select-item v-for="arm in armateurs" :key="arm" :value="arm" :text="arm" />
             </vs-select>
+            <vs-input label="Déclaration" v-model="form.declaration" />
+            <vs-input label="BL" v-model="form.bl" />
+          </div>
+        </div>
+        <!-- Zones -->
+        <div class="zones-section-admin">
+            <div class="zones-header-admin">
+                <h4>Zones & Destinations</h4>
 
-            <!-- Multi destinations filtered by selected zone -->
-            <vs-select
-              v-model="form.zones[idx].destinations"
-              multiple
-              placeholder="Sélectionner destination(s)"
-              :disabled="!form.zones[idx].zoneId"
-            >
-              <vs-option
-                v-for="dest in getDestinationsForZone(form.zones[idx].zoneId)"
-                :key="dest.id"
-                :value="dest.nom"
-                :label="dest.nom"
-              >
-                {{ dest.nom }}
-              </vs-option>
-            </vs-select>
-
-            <!-- Boutons actions -->
-            <div class="zone-actions">
-              <vs-button icon size="small" color="danger" v-if="form.zones.length > 1" @click="removeZoneSelect(idx)">
-                <i class="bx bx-trash"></i>
-              </vs-button>
+                <vs-button icon @click="addZoneSelect" color="success">+ Destination</vs-button>
             </div>
-          </div>
 
-          <!-- Affichage résumé (optionnel) -->
-          <div class="zone-summary">
-            <small v-if="form.zones[idx].zoneId">
-              <strong>Zone:</strong>
-              {{ getZoneName(form.zones[idx].zoneId) || '-' }}
-              — <strong>Dest:</strong> {{ (form.zones[idx].destinations || []).join(', ') || '-' }}
-            </small>
-          </div>
+            <div class="zones-table">
+                <div class="zones-row" v-for="(z, idx) in form.zones" :key="idx">
+
+                    <!-- Destination d'abord -->
+                    <vs-select label="Destination" v-model="z.destinationId" placeholder="selectionnez une destination" @change="onDestinationChange(idx)">
+                        <vs-select-item
+                        v-for="dest in destinations"
+                        :key="dest.id"
+                        :value="dest.id"
+                        :text="dest.nom"
+                        />
+                    </vs-select>
+
+                    <!-- Zone auto -->
+                    <vs-input
+                        v-model="z.zoneName"
+                        label="Zone"
+                        disabled
+                    />
+
+                    <!-- Remove -->
+                    <vs-button
+                        v-if="form.zones.length > 1"
+                        color="danger"
+                        icon
+                        @click="removeZoneSelect(idx)"
+                    >X</vs-button>
+
+                </div>
+            </div>
         </div>
-      </div>
 
-      <!-- Footer -->
-      <div class="footer-dialog">
-        <vs-button color="danger" @click="closeModal">Annuler</vs-button>
-        <vs-button color="success" @click="saveDossier">Enregistrer</vs-button>
+        <!-- Actions -->
+        <div class="footer-dialog-admin">
+          <vs-button color="danger" @click="closeModal">Annuler</vs-button>
+          <vs-button color="success" @click="saveDossier">Enregistrer</vs-button>
+        </div>
+
       </div>
     </vs-popup>
-
-    <!-- Liste des dossiers enregistrés localement -->
-    <div v-if="savedDossiers.length" class="list-container">
-      <h4>📁 Dossiers créés :</h4>
-      <ul>
-        <li v-for="(d, i) in savedDossiers" :key="i">
-          {{ d.numero_doc }} — {{ d.client }} — Zones: {{ d.zones.map(z => z.zoneName).join('; ') }}
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 
 <script>
-let zoneCounterId = 1; // id local pour chaque zone-item
-
 export default {
   name: "FormulaireDossier",
   data() {
     return {
       active: false,
+      armateurs: ["CMA CGM", "MAERSK", "MSC", "BOLLORE"],
+
+        destinations: [
+        { id: 1, nom: "Treichville",    zone: "Zone 1" },
+        { id: 2, nom: "Marcory",        zone: "Zone 1" },
+        { id: 3, nom: "Marcory Boulevard", zone: "Zone 2" },
+        { id: 4, nom: "Koumassi",       zone: "Zone 2" },
+        { id: 5, nom: "Plateau",        zone: "Zone 2" },
+        { id: 6, nom: "Port-Bouët",     zone: "Zone 2" },
+        { id: 7, nom: "Adjamé",         zone: "Zone 3" },
+        { id: 8, nom: "Yopougon",       zone: "Zone 3" },
+        { id: 9, nom: "Bingerville",    zone: "Zone 3" },
+        ],
+
       form: {
         numero_doc: "",
         date_recep: "",
         date_badt: "",
         client: "",
         armateur: "",
-        // zones: tableau d'objets { id: number, zoneId: number|null, zoneName: string, destinations: [] }
-        zones: [
-          { id: zoneCounterId++, zoneId: null, zoneName: "", destinations: [] }
-        ],
         declaration: "",
         bl: "",
-        nb_tcs: 0,
         adresse_client: "",
-        contact_client: ""
-      },
-      // jeux de données locaux (simulent les tables zone / destination)
-      availableZones: [
-        { id: 1, nom: "Zone 1" },
-        { id: 2, nom: "Zone 2" },
-        { id: 3, nom: "Zone 3" }
-      ],
-      destinations: [
-        // zone 1
-        { id: 1, zoneId: 1, nom: "Treichville" },
-        { id: 2, zoneId: 1, nom: "Marcory" },
-        // zone 2
-        { id: 3, zoneId: 2, nom: "Koumassi" },
-        { id: 4, zoneId: 2, nom: "Plateau" },
-        { id: 5, zoneId: 2, nom: "Port-Bouët" },
-        // zone 3
-        { id: 6, zoneId: 3, nom: "Adjamé" },
-        { id: 7, zoneId: 3, nom: "Yopougon" },
-        { id: 8, zoneId: 3, nom: "Bingerville" }
-      ],
-      savedDossiers: []
+        contact_client: "",
+        zones: [{ destinationId: null, zoneName: "" }]
+      }
     };
   },
   methods: {
     openModal() {
-      this.generateNumeroDoc();
+      this.generateNumero();
       this.form.date_recep = new Date().toISOString().split("T")[0];
       this.active = true;
     },
     closeModal() {
       this.active = false;
-      this.resetForm();
     },
-    generateNumeroDoc() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const count = this.savedDossiers.length + 1;
-      this.form.numero_doc = `DOS-${year}${month}-${String(count).padStart(4, "0")}`;
+    onDestinationChange(idx) {
+        const dest = this.destinations.find(d => d.id === this.form.zones[idx].destinationId);
+        this.form.zones[idx].zoneName = dest ? dest.zone : "";
     },
-
-    /* ---------- Zones management ---------- */
     addZoneSelect() {
-      this.form.zones.push({ id: zoneCounterId++, zoneId: null, zoneName: "", destinations: [] });
+        this.form.zones.push({ destinationId: null, zoneName: "" });
     },
-    removeZoneSelect(index) {
-      this.form.zones.splice(index, 1);
+    removeZoneSelect(idx) {
+        this.form.zones.splice(idx, 1);
     },
-    onZoneChange(index) {
-      const z = this.form.zones[index];
-      // mettre à jour zoneName pour affichage et reset destinations sélectionnées
-      z.zoneName = this.getZoneName(z.zoneId);
-      z.destinations = [];
-    },
-    getZoneName(zoneId) {
-      const found = this.availableZones.find(z => z.id === zoneId);
-      return found ? found.nom : "";
-    },
-    getDestinationsForZone(zoneId) {
-      if (!zoneId) return [];
-      return this.destinations.filter(d => d.zoneId === zoneId);
+    generateNumero() {
+      const mois = new Date().getMonth() + 1;
+      const annee = new Date().getFullYear().toString().slice(-2);
+      const random = Math.floor(Math.random() * 999).toString().padStart(3, "0");
+      this.form.numero_doc = `DOSS-${annee}-${mois}-${random}`;
     },
 
-    /* ---------- Save ---------- */
     saveDossier() {
-      if (!this.form.client || !this.form.armateur) {
-        this.$vs.notification({
-          title: "Champs manquants",
-          text: "Veuillez remplir au moins le client et l’armateur.",
-          color: "warning"
-        });
-        return;
-      }
-
-      // Validation minimale : s'assurer qu'au moins une zone est sélectionnée
-      const validZones = this.form.zones.filter(z => z.zoneId);
-      if (validZones.length === 0) {
-        this.$vs.notification({
-          title: "Zones manquantes",
-          text: "Veuillez sélectionner au moins une zone.",
-          color: "warning"
-        });
-        return;
-      }
-
-      // Préparer payload (copie propre)
-      const payload = {
-        ...this.form,
-        zones: this.form.zones.map(z => ({
-          zoneId: z.zoneId,
-          zoneName: this.getZoneName(z.zoneId),
-          destinations: Array.isArray(z.destinations) ? z.destinations.slice() : []
-        }))
-      };
-
-      this.savedDossiers.push(payload);
-      this.$vs.notification({
-        title: "Succès",
-        text: "Dossier créé avec succès (local).",
-        color: "success"
-      });
-
+      console.log("📝 Dossier :", JSON.parse(JSON.stringify(this.form)));
+      this.$vs.notify({ color: "success", title: "Succès", text: "Dossier enregistré (simulation)" });
       this.closeModal();
-    },
-
-    resetForm() {
-      zoneCounterId = 1;
-      this.form = {
-        numero_doc: "",
-        date_recep: "",
-        date_badt: "",
-        client: "",
-        armateur: "",
-        zones: [{ id: zoneCounterId++, zoneId: null, zoneName: "", destinations: [] }],
-        declaration: "",
-        bl: "",
-        nb_tcs: 0,
-        adresse_client: "",
-        contact_client: ""
-      };
     }
   }
 };
 </script>
 
 <style scoped>
-.popup-large {
-  width: 85vw;
-  max-width: 1100px;
+/* vs-popup full screen & transparent */
+.popup-full .vs-popup {
+  background: rgba(0,0,0,0.4) !important; /* léger fond sombre */
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-/* grille deux colonnes pour les champs principaux */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  padding: 10px 4px;
+/* Container centré */
+.modal-container {
+  width: 100%;
+  max-width: 900px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0px;
+  animation: fadeIn .25s ease-out;
+  gap: 6px;
 }
 
-/* colonne */
-.form-column {
+/* Titre */
+.modal-title {
+  font-weight: bold;
+  margin-bottom: 18px;
+  font-size: large;
+}
+
+/* Layout Form */
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+/* Zones */
+.zones-section-admin {
+  margin-top: 16px;
+  border-top: 1px solid #ececec;
+  padding-top: 1px;
+}
+
+.zones-header-admin {
+  display: flex;
+  justify-content:space-between;
+  margin-bottom: 10px;
+}
+.zones-table {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 2px;
 }
-
-/* section zones */
-.zones-section {
-  margin-top: 18px;
-  padding: 12px;
-  border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
-}
-
-.zones-header {
+.zones-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-/* item zone (select + destinations + actions) */
-.zone-item {
-  margin-bottom: 10px;
-  padding: 8px;
-  border-radius: 6px;
-  background: #fbfbfb;
-  border: 1px solid #efefef;
-}
-
-.zone-row {
-  display: grid;
-  grid-template-columns: 2fr 2fr 40px;
-  gap: 10px;
+  gap: 2px;
   align-items: center;
 }
 
-.zone-summary {
-  margin-top: 6px;
-  color: #666;
-}
 
-/* actions + footer */
-.zone-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.footer-dialog {
+/* Footer */
+.footer-dialog-admin {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
   margin-top: 18px;
-  padding-top: 12px;
-  border-top: 1px solid #eee;
+  gap: 2px;
 }
 
-/* liste locales */
-.list-container {
-  margin-top: 20px;
-  background: #fafafa;
-  padding: 12px;
-  border-radius: 8px;
-}
-
-/* responsive */
-@media (max-width: 900px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  .zone-row {
-    grid-template-columns: 1fr;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>

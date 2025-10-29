@@ -192,7 +192,7 @@ export default {
   width: 100%;
   flex-wrap: nowrap;
   overflow: hidden;
-  position: sticky;
+  position: fixed;
   top: 0;
   z-index: 1100;
 }
