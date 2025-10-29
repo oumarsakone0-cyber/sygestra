@@ -25,11 +25,6 @@
       <!-- Contenu principal -->
       <div class="content">
         <router-view />
-        <HelloWorld />
-        
-        <Table_dossier />
-        <br><br><hr><br><br>
-        <Formulaire_dossier />
       </div>
     </div>
   </div>
@@ -39,11 +34,6 @@
 <script>
 import Navbar from './components/menu/nav_barre.vue'
 import Sidebar from './components/menu/sidebar.vue' // 
-import Table_dossier from './components/table/Table_dossier.vue'
-
-import HelloWorld from './components/HelloWorld.vue'
-import Formulaire_dossier from './components/formulaire_dossier/formulaire_dossier.vue'
-
 
 
 
@@ -51,11 +41,7 @@ export default {
   name: 'App',
   components: {
     Navbar,
-    
-    HelloWorld,
     Sidebar,
-    Table_dossier,
-    Formulaire_dossier
     
   },
   data() {

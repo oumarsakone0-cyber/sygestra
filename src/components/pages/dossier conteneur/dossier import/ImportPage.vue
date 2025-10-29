@@ -142,13 +142,26 @@
         <div class="green-bar"></div>
       </div>
     </div>
-    <br><br><hr>
+    <br><br><hr><br><br>
+     <!-- Liste des dossiers -->
+  <Table_dossier />
+  <br><br><hr><br><br>
+  <!-- Formulaire modal -->
+  <formulaire_dossier />
   </div>
 </template>
 
 <script>
+import Table_dossier from '@/components/table/Table_dossier.vue';
+import formulaire_dossier from '@/components/formulaire_dossier/formulaire_dossier.vue';
+
 export default {
   name: 'ImportPage',
+  components: {
+    formulaire_dossier,
+    Table_dossier
+  },
+
   data() {
     return {
       dateRange: ['2025-10-20', '2025-10-20'],
