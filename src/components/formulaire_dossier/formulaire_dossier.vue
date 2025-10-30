@@ -83,25 +83,25 @@
 </template>
 
 <script>
+import { dossiersAPI } from "@/api/dossiersAPI";
+
 export default {
   name: "FormulaireDossier",
   data() {
     return {
       active: false,
       armateurs: ["CMA CGM", "MAERSK", "MSC", "BOLLORE"],
-
-        destinations: [
-        { id: 1, nom: "Treichville",    zone: "Zone 1" },
-        { id: 2, nom: "Marcory",        zone: "Zone 1" },
+      destinations: [
+        { id: 1, nom: "Treichville", zone: "Zone 1" },
+        { id: 2, nom: "Marcory", zone: "Zone 1" },
         { id: 3, nom: "Marcory Boulevard", zone: "Zone 2" },
-        { id: 4, nom: "Koumassi",       zone: "Zone 2" },
-        { id: 5, nom: "Plateau",        zone: "Zone 2" },
-        { id: 6, nom: "Port-Bouët",     zone: "Zone 2" },
-        { id: 7, nom: "Adjamé",         zone: "Zone 3" },
-        { id: 8, nom: "Yopougon",       zone: "Zone 3" },
-        { id: 9, nom: "Bingerville",    zone: "Zone 3" },
-        ],
-
+        { id: 4, nom: "Koumassi", zone: "Zone 2" },
+        { id: 5, nom: "Plateau", zone: "Zone 2" },
+        { id: 6, nom: "Port-Bouët", zone: "Zone 2" },
+        { id: 7, nom: "Adjamé", zone: "Zone 3" },
+        { id: 8, nom: "Yopougon", zone: "Zone 3" },
+        { id: 9, nom: "Bingerville", zone: "Zone 3" },
+      ],
       form: {
         numero_doc: "",
         date_recep: "",
@@ -112,43 +112,69 @@ export default {
         bl: "",
         adresse_client: "",
         contact_client: "",
-        zones: [{ destinationId: null, zoneName: "" }]
-      }
+        zones: [{ destinationId: null, zoneName: "" }],
+      },
     };
   },
   methods: {
-    openModal() {
-      this.generateNumero();
-      this.form.date_recep = new Date().toISOString().split("T")[0];
-      this.active = true;
+    async openModal() {
+      try {
+        // ✅ Génère le numéro depuis le backend selon armateur/mois/année
+        if (this.form.armateur) {
+          const numero = await dossiersAPI.generateNumero(this.form.armateur);
+          this.form.numero_doc = numero;
+        } else {
+          this.form.numero_doc = "";
+        }
+
+        this.form.date_recep = new Date().toISOString().split("T")[0];
+        this.active = true;
+      } catch (error) {
+        console.error("Erreur génération numéro :", error);
+        this.$vs.notify({
+          color: "danger",
+          title: "Erreur",
+          text: "Impossible de générer le numéro du dossier",
+        });
+      }
     },
     closeModal() {
       this.active = false;
     },
     onDestinationChange(idx) {
-        const dest = this.destinations.find(d => d.id === this.form.zones[idx].destinationId);
-        this.form.zones[idx].zoneName = dest ? dest.zone : "";
+      const dest = this.destinations.find(
+        (d) => d.id === this.form.zones[idx].destinationId
+      );
+      this.form.zones[idx].zoneName = dest ? dest.zone : "";
     },
     addZoneSelect() {
-        this.form.zones.push({ destinationId: null, zoneName: "" });
+      this.form.zones.push({ destinationId: null, zoneName: "" });
     },
     removeZoneSelect(idx) {
-        this.form.zones.splice(idx, 1);
+      this.form.zones.splice(idx, 1);
     },
-    generateNumero() {
-      const mois = new Date().getMonth() + 1;
-      const annee = new Date().getFullYear().toString().slice(-2);
-      const random = Math.floor(Math.random() * 999).toString().padStart(3, "0");
-      this.form.numero_doc = `DOSS-${annee}-${mois}-${random}`;
+    async saveDossier() {
+      try {
+        const response = await dossiersAPI.addDossier(this.form);
+        this.$vs.notify({
+          color: "success",
+          title: "Succès",
+          text: "Dossier enregistré avec succès",
+        });
+        this.closeModal();
+        console.log("✅ Dossier créé :", response);
+      } catch (error) {
+        console.error(error);
+        this.$vs.notify({
+          color: "danger",
+          title: "Erreur",
+          text: error.message || "Impossible d'enregistrer le dossier",
+        });
+      }
     },
-
-    saveDossier() {
-      console.log("📝 Dossier :", JSON.parse(JSON.stringify(this.form)));
-      this.$vs.notify({ color: "success", title: "Succès", text: "Dossier enregistré (simulation)" });
-      this.closeModal();
-    }
-  }
+  },
 };
+
 </script>
 
 <style scoped>

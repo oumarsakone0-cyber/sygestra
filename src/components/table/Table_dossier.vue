@@ -210,217 +210,77 @@
 </template>
 
 <script>
+import { dossiersAPI } from '@/api/dossiersAPI.js';
+
 export default {
   name: 'TableauDossiers',
+  
   data() {
     return {
       showModalBADT: false,
-      searchQuerybadt:'',
+      searchQuerybadt: '',
       searchQuery: '',
-      dossierbadt: [
-        {
-          id: 1,
-          numero: '10/25 - PM 14',
-          dateReception: '2024-12-26',
-          badt: '2025-10-29',
-          client: 'ACTIVA TRADE',
-          armateur: 'PROPRE MOYEN',
-          tcs: 4,
-          scan: 0,
-          livre: 4,
-          recup: 0,
-          zone: 'COCODY',
-          declaration: 'C72872',
-          bl: 'COSU5403205400',
-          type: '4 20\'',
-          contact: 'MIENSAH',
-          modeLivraison: 'PROPRE MOYEN',
-          remorque: ''
-        },
-      ],
-      
-      dossiers: [
-        {
-          id: 1,
-          numero: '12/24 - PM 14',
-          dateReception: '2024-12-26',
-          badt: '2024-12-26',
-          client: 'ACTIVA TRADE',
-          armateur: 'PROPRE MOYEN',
-          tcs: 4,
-          scan: 0,
-          livre: 4,
-          recup: 0,
-          zone: 'COCODY',
-          declaration: 'C72872',
-          bl: 'COSU5403205400',
-          type: '4 20\'',
-          contact: 'MIENSAH',
-          modeLivraison: 'PROPRE MOYEN',
-          remorque: ''
-        },
-        {
-          id: 2,
-          numero: '12/24 - PM 13',
-          dateReception: '2024-12-26',
-          badt: '2024-12-28',
-          client: 'AFRICA IMPORT',
-          armateur: 'PROPRE MOYEN',
-          tcs: 1,
-          scan: 0,
-          livre: 1,
-          recup: 0,
-          zone: 'YOPOUGON',
-          declaration: 'C72376',
-          bl: 'MEDUFS972569',
-          type: '1 20\'',
-          contact: '',
-          modeLivraison: 'PROPRE MOYEN',
-          remorque: ''
-        },
-        {
-          id: 3,
-          numero: '12/24 - MAE 45',
-          dateReception: '2024-12-20',
-          badt: '',
-          client: 'MEDINEX',
-          armateur: 'Maersk',
-          tcs: 2,
-          scan: 0,
-          livre: 2,
-          recup: 0,
-          zone: 'BINGERVILLE',
-          declaration: 'C70934',
-          bl: '246039074',
-          type: '2 40\'',
-          contact: '',
-          modeLivraison: 'Maersk',
-          remorque: ''
-        },
-        {
-          id: 4,
-          numero: '12/24 - MAE 44',
-          dateReception: '2024-12-18',
-          badt: '2024-12-20',
-          client: '',
-          armateur: 'Maersk',
-          tcs: 1,
-          scan: 0,
-          livre: 1,
-          recup: 1,
-          zone: 'MARCORY AVANT BLD',
-          declaration: 'C70780',
-          bl: '247128580',
-          type: '1 40\'',
-          contact: '',
-          modeLivraison: 'Maersk',
-          remorque: ''
-        },
-        {
-          id: 5,
-          numero: '12/24 - MAE 43',
-          dateReception: '2024-12-18',
-          badt: '2024-12-20',
-          client: 'GTSE',
-          armateur: 'Maersk',
-          tcs: 1,
-          scan: 0,
-          livre: 1,
-          recup: 1,
-          zone: 'MARCORY AVANT BLD',
-          declaration: 'C70624',
-          bl: '246227841',
-          type: '1 40\'',
-          contact: '',
-          modeLivraison: 'Maersk',
-          remorque: ''
-        }
-      ]
+      dossiersData: [], // données récupérées depuis l'API
     }
   },
   computed: {
     filteredDossiers() {
-      if (!this.searchQuery) return this.dossiers
-      
-      const query = this.searchQuery.toLowerCase()
-      return this.dossiers.filter(dossier => {
-        return Object.values(dossier).some(value => 
-          String(value).toLowerCase().includes(query)
-        )
-      })
-    },
-    badtToday() {
-    const today = new Date().toISOString().split('T')[0];
-    return this.dossierbadt.filter(d => d.badt === today);
-   },
-    filteredBadtToday() {
-      if (!this.badtToday.length) return this.dossierbadt;
-
-      if (!this.searchQuerybadt) return this.badtToday;
-
-      const query = this.searchQuerybadt.toLowerCase();
-      return this.badtToday.filter(dossier =>
-        Object.values(dossier).some(value => 
+      if (!this.searchQuery) return this.dossiersData;
+      const query = this.searchQuery.toLowerCase();
+      return this.dossiersData.filter(dossier =>
+        Object.values(dossier).some(value =>
           String(value).toLowerCase().includes(query)
         )
       );
     },
-
+    badtToday() {
+      const today = new Date().toISOString().split('T')[0];
+      return this.dossiersData.filter(d => d.badt === today);
+    },
+    filteredBadtToday() {
+      if (!this.badtToday.length) return [];
+      if (!this.searchQuerybadt) return this.badtToday;
+      const query = this.searchQuerybadt.toLowerCase();
+      return this.badtToday.filter(dossier =>
+        Object.values(dossier).some(value =>
+          String(value).toLowerCase().includes(query)
+        )
+      );
+    },
     badtCount() {
       return this.badtToday.length;
-    
+    }
+  },
+  async mounted() {
+    try {
+      this.dossiersData = await dossiersAPI.getDossiers();
+    } catch (e) {
+      console.error('Erreur récupération dossiers:', e);
     }
   },
   methods: {
     exporterExcel() {
-      // Créer le contenu CSV
       const headers = [
-        'N° Dossier', 'Reception', 'BADT', 'Client', 'Armateur', 
-        'TC(s)', 'Scan', 'Livré', 'Récup', 'ZONE', 
-        'DECLARATION', 'BL', 'Type'
-      ]
-      
-      let csvContent = headers.join(',') + '\n'
-      
-      this.filteredDossiers.forEach(dossier => {
+        'N° Dossier','Reception','BADT','Client','Armateur','TC(s)',
+        'Scan','Livré','Récup','ZONE','DECLARATION','BL','Type'
+      ];
+      let csvContent = headers.join(',') + '\n';
+      this.filteredDossiers.forEach(d => {
         const row = [
-          dossier.numero,
-          dossier.dateReception,
-          dossier.badt,
-          dossier.client,
-          dossier.armateur,
-          dossier.tcs,
-          dossier.scan,
-          dossier.livre,
-          dossier.recup,
-          dossier.zone,
-          dossier.declaration,
-          dossier.bl,
-          dossier.type
-        ].map(value => `"${value}"`).join(',')
-        
-        csvContent += row + '\n'
-      })
-      
-      // Télécharger le fichier
-      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
-      const link = document.createElement('a')
-      const url = URL.createObjectURL(blob)
-      
-      link.setAttribute('href', url)
-      link.setAttribute('download', `dossiers_${new Date().toISOString().split('T')[0]}.csv`)
-      link.style.visibility = 'hidden'
-      
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      
-      this.$vs.notify({
-        title: 'Export réussi',
-        text: 'Les données ont été exportées en CSV',
-        color: 'success',
-        position: 'top-right'
-      })
+          d.numero, d.dateReception, d.badt, d.client, d.armateur,
+          d.tcs, d.scan, d.livre, d.recup, d.zone, d.declaration,
+          d.bl, d.type
+        ].map(v => `"${v}"`).join(',');
+        csvContent += row + '\n';
+      });
+
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `dossiers_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
     
     genererPDF(dossier) {
